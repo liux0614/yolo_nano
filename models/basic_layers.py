@@ -104,7 +104,7 @@ class FCA(nn.Module):
 
 
 class YOLOLayer(nn.Module):
-    ## detection layer
+    # detection layer
     def __init__(self, anchors, num_classes, img_dim=416):
         super(YOLOLayer, self).__init__()
         self.anchors = anchors
