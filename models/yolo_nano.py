@@ -88,6 +88,7 @@ class YOLONano(nn.Module):
         out = self.pep2(out)
         out = self.pep3(out)
         out = self.ep2(out)
+        out = self.pep4(out)
         out = self.conv3(out)
         out = self.fca1(out)
         out = self.pep5(out)
