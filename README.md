@@ -11,11 +11,11 @@ YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 - [ ] Test accuracy
 
 # Installation
-```python3
+```bash
 git clone https://github.com/liux0614/yolo_nano
 pip3 install -r requirements.txt
 ```
 # Training
-```python3
+```bash
 python3 main.py --dataset_path datasets --dataset coco --lr 0.001 --conf_thres 0.8 --nms_thres 0.5 --multiscale
 ```
