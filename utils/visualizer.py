@@ -21,12 +21,8 @@ class Visualizer():
     def __init__(self, opt):
         self.opt = opt
         self.ncols = opt.ncols
-        self.log_root = os.path.join(opt.checkpoint_dir, opt.name)
-        if not os.path.exists(self.log_root):
-            os.makedirs(self.log_root)
-
-        self.log_name = os.path.join(opt.checkpoint_dir, opt.name, 'loss_log.txt')
-        with open(self.log_name, 'a') as log_file:
+        self.log_file_path = os.path.join(self.opt.checkpoint_path, 'log.txt')
+        with open(self.log_file_path, 'a') as log_file:
             log_file.write('===================================Training Loss ============================\n')
 
         self.viz = visdom.Visdom()
@@ -64,49 +60,19 @@ class Visualizer():
         self.viz.image(np.array(img).transpose((2,0,1)), win=1)
 
     def print_current_losses(self, error_ret, epoch, cur_iter, total_iter):
-        if self.opt.model == 'yolo_nano':
-            self.print_oriyolo(error_ret, epoch, cur_iter, total_iter)
-
-    # still has some bugs here
-    def plot_current_visuals(self, imgs, detections):
-        if self.opt.model == 'yolo_nano':
-            self.plot_oriyolo(imgs, detections)
-
-    def plot_save_current_visual(self, img, detections):
-        # plot the detections
-        toImg = transforms.ToPILImage()
-        img = toImg(img[0,...])
-        ori_w, ori_h = img.size
-        img = img.resize((540, 540))
-        draw = Draw(img)
-        w, h = img.size 
-        cls_name = ['car', 'person', 'fire']
-        for detection in detections:
-            if detection is None:
-                print("no detection is detected")
-                return
-            for x1, y1, x2, y2, conf, cls_conf, cls_pred in detection:
-                x1 = float(x1) / ori_w * w;  x1 = max(0, int(x1))
-                y1 = float(y1) / ori_h * h;  y1 = max(0, int(y1))
-                x2 = float(x2) / ori_w * w;  x2 = min(int(x2), w)
-                y2 = float(y2) / ori_h * h;  y2 = min(int(y2), h) 
-                draw.rectangle([(x1, y1), (x2,y2)], outline=(255,255,0))
-            self.viz.image(np.array(img).transpose((2,0,1)), win=1)
-        # save the images
-
-    def print_oriyolo(self, error_ret, epoch, cur_iter, total_iter):
         metrics = ['loss', 'x', 'y', 'w', 'h', 'conf','cls', 'cls_acc', 'recall50', 'recall75', 'precision', 'conf_obj', 'conf_noobj', 'grid_size']
-        message = '\n----------[Epoch %d/%d, Batch %d/%d] -----------------\n' % (epoch, self.opt.start_epochs+self.opt.epochs, cur_iter, total_iter)
+        message = '\n----------[Epoch %d/%d, Batch %d/%d] -----------------\n' % (epoch, self.opt.num_epochs, cur_iter, total_iter)
         
         for key in metrics:
             message += '{:>10}\t{:>10.4f}\t{:10.4f}\t{:10.4f}\n'.format(key, error_ret[0][key], error_ret[1][key], error_ret[2][key])
         message += '------------------------------------------------------\n'
 
         print(message)
-        with open(self.log_name, 'a') as log_file:
+        with open(self.log_file_path, 'a') as log_file:
             log_file.write('%s\n' % message)
 
-    def plot_oriyolo(self, imgs, detections):
+    # still has some bugs here
+    def plot_current_visuals(self, imgs, detections):
         detections = non_max_suppression(detections, self.opt.conf_thres, self.opt.nms_thres)
         toImg = transforms.ToPILImage()
         # we only show the image_batch[0]
@@ -148,3 +114,24 @@ class Visualizer():
                     f = ImageFont.truetype("fonts-japanese-gothic.ttf", 15)
                     draw.text((x1,y1), name, 'blue', font=f)
                 self.viz.image(np.array(img).transpose((2,0,1)), win=i+2)
+
+    def plot_save_current_visual(self, img, detections):
+        # plot the detections
+        toImg = transforms.ToPILImage()
+        img = toImg(img[0,...])
+        ori_w, ori_h = img.size
+        img = img.resize((540, 540))
+        draw = Draw(img)
+        w, h = img.size 
+        cls_name = ['car', 'person', 'fire']
+        for detection in detections:
+            if detection is None:
+                print("no detection is detected")
+                return
+            for x1, y1, x2, y2, conf, cls_conf, cls_pred in detection:
+                x1 = float(x1) / ori_w * w;  x1 = max(0, int(x1))
+                y1 = float(y1) / ori_h * h;  y1 = max(0, int(y1))
+                x2 = float(x2) / ori_w * w;  x2 = min(int(x2), w)
+                y2 = float(y2) / ori_h * h;  y2 = min(int(y2), h) 
+                draw.rectangle([(x1, y1), (x2,y2)], outline=(255,255,0))
+            self.viz.image(np.array(img).transpose((2,0,1)), win=1)

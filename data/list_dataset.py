@@ -8,7 +8,7 @@ import os
 
 from data.base_dataset import BaseDataset
 
-# reimplement yolov3 dataset.py in here
+
 class ListDataset(BaseDataset):
     def __init__(self, folder_path, img_size=416, augment=True, multiscale=True, normalized_labels=True):
         # read all the images paths
@@ -21,7 +21,6 @@ class ListDataset(BaseDataset):
         self.normalized_labels = normalized_labels
         self.min_size = self.img_size - 3 * 32
         self.max_size = self.img_size + 3 * 32
-        #self.batch_count = 0
 
     def __getitem__(self, index):
         # image
@@ -71,7 +70,7 @@ class ListDataset(BaseDataset):
             if np.random.random() < 0.5:
                 img, targets = self.horisontal_flip(img, targets)
 
-        return img_path, img, targets
+        return img, targets
 
     def __len__(self):
         return len(self.img_paths)
@@ -80,7 +79,7 @@ class ListDataset(BaseDataset):
         return "ListDataset"
 
     def collate_fn(self, batch):
-        paths, imgs, targets = list(zip(*batch))
+        imgs, targets = list(zip(*batch))
         targets = [boxes for boxes in targets if boxes is not None]
         for i, boxes in enumerate(targets):
             boxes[:, 0] = i
@@ -89,4 +88,4 @@ class ListDataset(BaseDataset):
             self.img_size = random.choice(range(self.min_size, self.max_size + 1, 32))
         # Resize images to input shape
         imgs = torch.stack([self.resize(img, self.img_size) for img in imgs])
-        return paths, imgs, targets
+        return imgs, targets

@@ -1,5 +1,3 @@
-# this module implements an abstract base class
-
 import random
 import numpy as np 
 import torch.utils.data as data
@@ -34,7 +32,6 @@ class BaseDataset(data.Dataset):
 
     def random_resize(self, images, min_size=288, max_size=488, mode='bilinear'):
         new_size = random.sample(list(range(min_size, max_size+1, 32)), 1)[0]
-        print('new_size: ', new_size)
         images = F.interpolate(images, size=new_size, mode=mode)
         return images
 

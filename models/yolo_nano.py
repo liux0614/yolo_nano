@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F 
+import torch.nn.functional as F
 
 from .basic_layers import conv1x1, conv3x3, EP, PEP, FCA, YOLOLayer
 from utils.stats import build_targets, to_cpu, non_max_suppression
