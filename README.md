@@ -40,5 +40,5 @@ pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&sub
 To train on COCO dataset:
 ```bash
 python3 main.py --dataset_path datasets/coco/images --annotation_path datasets/coco/annotation/instances_train2017.json 
-                --dataset coco --subset train2017 --lr 0.0001 --conf_thres 0.8 --nms_thres 0.5
+                --dataset coco --lr 0.0001 --conf_thres 0.8 --nms_thres 0.5
 ```
