@@ -8,8 +8,9 @@ from torch import nn
 from torch import optim
 from torch.optim import lr_scheduler
 
-from data.get_dataset import get_dataset
+from data.get_dataset import get_training_dataset, get_validation_set
 from models.get_model import get_model
+from transforms.transforms import Compose, MultiScale, ToTensor
 from utils.opts import Opt
 from utils.visualizer import Visualizer
 from train import train
@@ -33,9 +34,15 @@ if __name__ == "__main__":
     scheduler = lr_scheduler.ReduceLROnPlateau(
         optimizer, 'min', patience=opt.lr_patience)
     
+    ########################################
+    #              Transforms              #
+    ########################################
+    transforms = Compose([
+        MultiScale(opt.image_size), ToTensor()
+    ])
 
     if opt.train:
-        dataset = get_dataset(opt)
+        dataset = get_dataset(opt, transforms)
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_size=opt.batch_size,

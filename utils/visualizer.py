@@ -30,7 +30,20 @@ class Visualizer():
 
     def plot_target(self, imgs, targets):
         toImg = transforms.ToPILImage()
-        cls_name = ['car', 'person', 'fire']
+        cls_name = [
+            'person', 'bicycle', 'car', 'motorcycle', 'airplane',
+            'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
+            'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse',
+            'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
+            'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
+            'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
+            'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass',
+            'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
+            'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake',
+            'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv',
+            'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
+            'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
+            'scissors', 'teddy bear', 'hair drier', 'toothbrush']
         for i in range(imgs.size(0)):
             img = toImg(imgs[i, ...])
             img = img.resize((540, 540))
@@ -49,9 +62,6 @@ class Visualizer():
                 y1 = int(float(cy) * img_h - float(h) * img_h / 2)
                 x2 = int(float(cx) * img_w + float(w) * img_w / 2)
                 y2 = int(float(cy) * img_h + float(h) * img_h / 2)
-                # if (x2 - x1 > 120 or y2 -y1 > 120):
-                    # print(x2-x1, y2-y1)
-                #print(x2-x1, y2-y1)
                 draw.rectangle([(x1,y1), (x2,y2)], outline=(255,255,0))
             self.viz.image(np.array(img).transpose((2,0,1)), win=i)
 
@@ -79,7 +89,20 @@ class Visualizer():
 
         idx = []
         i = 0
-        cls_name = ['car', 'person', 'fire']
+        cls_name = [
+            'person', 'bicycle', 'car', 'motorcycle', 'airplane',
+            'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
+            'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse',
+            'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
+            'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
+            'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
+            'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass',
+            'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
+            'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake',
+            'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv',
+            'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
+            'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
+            'scissors', 'teddy bear', 'hair drier', 'toothbrush']
         for detection in detections:
             if detection is not None:
                 idx.append(i)

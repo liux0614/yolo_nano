@@ -14,9 +14,9 @@ class YOLONano(nn.Module):
         self.num_anchors = 3
         self.yolo_channels = (self.num_classes + 5) * self.num_anchors
         
-        anchors52 = [[61,9], [17,22], [22,50]] # 52x52
-        anchors26 = [[36, 30], [43, 65], [68, 41]] # 26x26
-        anchors13 = [[156, 134], [67, 107], [108, 63]] # 13x13
+        anchors52 = [[10,13], [16,30], [33,23]] # 52x52
+        anchors26 = [[30,61], [62,45], [59,119]] # 26x26
+        anchors13 = [[116,90], [156,198], [373,326]] # 13x13
         
         # image:  416x416x3
         self.conv1 = conv3x3(3, 12, stride=1) # output: 416x416x12

@@ -10,28 +10,31 @@ class Opt():
     def initialize(self):
         # project root, dataset, checkpoint resume and pretrained model path
         self.parser.add_argument("--project_root", type=str, default=".", help="root directory path of project")
-        self.parser.add_argument("--dataset_path", type=str, default="datasets", help="directory path of dataset")
+        self.parser.add_argument("--dataset_path", type=str, default="datasets/coco/jpg", help="directory path of dataset")
+        self.parser.add_argument("--annotation_path", type=str, default="datasets/coco/annotation/instances_val2017.json", help="directory path of annotations")
         self.parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="directory path of checkpoints")
         self.parser.add_argument("--resume_path", type=str, default="", help="save data (.pth) of previous training")
         self.parser.add_argument("--pretrain_path", type=str, default="", help="path of pretrain model (.pth)")
+        self.parser.add_argument("--subset", type=str, default="val", help="directory name of subset, e.g. train2017")
         # self.parser.add_argument("--result_path", type=str, default="results", help="directory path of results")
 
         # common options that are used in both train and test
         self.parser.add_argument("--manual_seed", type=int, default=42, help="manual_seed of pytorch")
-        self.parser.add_argument("--gpu_ids", type=str, default="0,1")
+        self.parser.add_argument("--no_cuda", action="store_true", help="if true, cuda is not used")
+        self.parser.set_defaults(no_cuda=False)
+
         self.parser.add_argument("--num_threads", type=int, default=8, help="# of cpu threads to use for batch generation")
         self.parser.add_argument("--dataset", default="coco", help="specify the type of custom dataset to create")
-        self.parser.add_argument("--dataset_mode", default="list", help="specify the type of custom dataset to create")
         self.parser.add_argument("--checkpoint_interval", type=int, default=10, help="interval between saving model weights")
         self.parser.add_argument("--evaluation_interval", type=int, default=1, help="interval evaluations on validation set")
 
         self.parser.add_argument("--model", type=str, default="yolo_nano", help="choose which model to use")
         self.parser.add_argument("--optimizer", type=str, default="Adam", help="optimizer (Adam | SGD)")
         self.parser.add_argument("--image_size", type=int, default=416, help="size of image")
-        self.parser.add_argument("--num_classes", type=int, default=3, help="# of classes of the dataset")
+        self.parser.add_argument("--num_classes", type=int, default=80, help="# of classes of the dataset")
         self.parser.add_argument('--num_epochs', type=int, default=20, help='# of epochs')
         self.parser.add_argument('--begin_epoch', type=int, default=0, help='# of epochs')
-        self.parser.add_argument("--batch_size", type=int, default=2, help="batch size")
+        self.parser.add_argument("--batch_size", type=int, default=1, help="batch size")
         self.parser.add_argument('--lr', type=float, default=1e-4, help="divided by `lr_patience` while training by lr scheduler")
         self.parser.add_argument('--lr_patience', type=int, default=10, help="patience of LR scheduler -- ReduceLROnPlateau")
         # self.parser.add_argument("--gradient_accumulations", type=int, default=2, help="# of gradient accums before step")
@@ -48,9 +51,7 @@ class Opt():
         self.parser.add_argument("--val", default=True, help="validation")
         self.parser.add_argument("--test", default=False, help="test")
         
-        # self.parser.add_argument("--display_freq", type=int, default=10, help='display the results in every # iterations')
         self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns (for visulizer)")
-
         self.parser.add_argument("--print_options", default=True, help="print options or not")
 
         self.initialized = True
@@ -84,17 +85,7 @@ class Opt():
         os.makedirs(self.opt.checkpoint_path, exist_ok=True)
         os.makedirs(self.opt.checkpoint_path, exist_ok=True)
 
-        os.environ['CUDA_VISIBLE_DEVICES'] = self.opt.gpu_ids
-        str_ids = self.opt.gpu_ids.split(',')
-        self.opt.gpu_ids = []
-        for str_id in str_ids:
-            id = int(str_id)
-            if id >= 0:
-                self.opt.gpu_ids.append(id)
-        if len(self.opt.gpu_ids) > 0:
-            self.opt.device = torch.device('cuda')
-        else:
-            self.opt.device = torch.device('cpu')
+        self.opt.device = torch.device('cpu') if self.opt.no_cuda else torch.device('cuda')
 
         #self.opt.anchors = [[10,13], [16,30], [33,23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]]
         # self.opt.class_names = ['car', 'person', 'fire']

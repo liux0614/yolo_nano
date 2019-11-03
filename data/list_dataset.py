@@ -16,8 +16,8 @@ class ListDataset(BaseDataset):
         self.label_paths = self.replace(self.img_paths)
         self.img_size = img_size
         self.max_objects = 100
-        self.augment = False #augment
-        self.multiscale = False #multiscale
+        self.augment = augment
+        self.multiscale = multiscale
         self.normalized_labels = normalized_labels
         self.min_size = self.img_size - 3 * 32
         self.max_size = self.img_size + 3 * 32
