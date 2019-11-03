@@ -15,7 +15,6 @@ class Opt():
         self.parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="directory path of checkpoints")
         self.parser.add_argument("--resume_path", type=str, default="", help="save data (.pth) of previous training")
         self.parser.add_argument("--pretrain_path", type=str, default="", help="path of pretrain model (.pth)")
-        self.parser.add_argument("--subset", type=str, default="val", help="directory name of subset, e.g. train2017")
         # self.parser.add_argument("--result_path", type=str, default="results", help="directory path of results")
 
         # common options that are used in both train and test
@@ -37,7 +36,6 @@ class Opt():
         self.parser.add_argument("--batch_size", type=int, default=1, help="batch size")
         self.parser.add_argument('--lr', type=float, default=1e-4, help="divided by `lr_patience` while training by lr scheduler")
         self.parser.add_argument('--lr_patience', type=int, default=10, help="patience of LR scheduler -- ReduceLROnPlateau")
-        # self.parser.add_argument("--gradient_accumulations", type=int, default=2, help="# of gradient accums before step")
         
         # object detection options
         self.parser.add_argument("--conf_thres", type=float, default=.8)

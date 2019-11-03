@@ -42,7 +42,7 @@ if __name__ == "__main__":
     ])
 
     if opt.train:
-        dataset = get_dataset(opt, transforms)
+        dataset = get_training_dataset(opt, transforms)
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_size=opt.batch_size,
