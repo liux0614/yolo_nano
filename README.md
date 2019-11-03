@@ -6,7 +6,7 @@ YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 - [x] Finish a draft version of implementation
 - [x] Add README
 - [x] Add checkpoint support
-- [x] Add COCO dataset support <p style='color:red'>Code needs cleaning. I'm working on it</p>
+- [x] Add COCO dataset support (Code still needs cleaning. I'm working on it.)
 - [x] Add transforms
 - [x] Reconstruct the code of visualizer
 - [ ] Add val and test
@@ -32,7 +32,7 @@ pip3 install -r requirements.txt
 ```
 
 # COCO
-To use COCO dataset loader, pycocotools should be installed.
+To use COCO dataset loader, _pycocotools_ should be installed via the following command.
 ```bash 
 pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"
 ```
