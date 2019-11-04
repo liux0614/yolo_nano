@@ -2,13 +2,15 @@
 
 YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 
+For bounding box with coordinate _x = 0_ (in yolo format), horizontal flipping results in out of index error in _YOLOLayer_ computation (specifically, in build_targets func). To solve this problem, I add _1e-4_ to _x_.
+
 # TODO
 - [x] Finish a draft version of implementation
 - [x] Add README
 - [x] Add checkpoint support
 - [x] Add COCO dataset support (Code still needs cleaning. I'm working on it.)
-- [x] Add transforms
-- [x] Reconstruct the code of visualizer
+- [x] Add _multi scale_ and _horizontal flip_ transforms
+- [ ] Reconstruct the code of visualizer
 - [ ] Add val and test
 - [ ] Test accuracy
 

@@ -7,10 +7,10 @@ from utils.stats import build_targets, to_cpu, non_max_suppression
 
 
 class YOLONano(nn.Module):
-    def __init__(self, num_classes, img_size):
+    def __init__(self, num_classes, image_size):
         super(YOLONano, self).__init__()
         self.num_classes = num_classes
-        self.img_size = img_size
+        self.image_size = image_size
         self.num_anchors = 3
         self.yolo_channels = (self.num_classes + 5) * self.num_anchors
         
@@ -64,22 +64,22 @@ class YOLONano(nn.Module):
         self.pep21 = PEP(122, 87, 52, stride=1) # output: 52x52x87
         self.pep22 = PEP(87, 93, 47, stride=1) # output: 52x52x93
         self.conv9 = conv1x1(93, self.yolo_channels, stride=1) # output: 52x52x yolo_channels
-        self.yolo_layer52 = YOLOLayer(anchors52, num_classes, img_dim=img_size)
+        self.yolo_layer52 = YOLOLayer(anchors52, num_classes, img_dim=image_size)
 
         # conv7 -> ep6
         self.ep6 = EP(98, 183, stride=1) # output: 26x26x183
         self.conv10 = conv1x1(183, self.yolo_channels, stride=1) # output: 26x26x yolo_channels
-        self.yolo_layer26 = YOLOLayer(anchors26, num_classes, img_dim=img_size)
+        self.yolo_layer26 = YOLOLayer(anchors26, num_classes, img_dim=image_size)
 
         # conv5 -> ep7
         self.ep7 = EP(189, 462, stride=1) # output: 13x13x462
         self.conv11 = conv1x1(462, self.yolo_channels, stride=1) # output: 13x13x yolo_channels
-        self.yolo_layer13 = YOLOLayer(anchors13, num_classes, img_dim=img_size)
+        self.yolo_layer13 = YOLOLayer(anchors13, num_classes, img_dim=image_size)
 
     def forward(self, x, targets=None):
         loss = 0
         yolo_outputs = []
-        img_dim = x.size(2)
+        image_size = x.size(2)
 
         out = self.conv1(x)
         out = self.conv2(out)
@@ -124,19 +124,19 @@ class YOLONano(nn.Module):
         out = self.pep21(out)
         out = self.pep22(out)
         out_conv9 = self.conv9(out)
-        temp, layer_loss = self.yolo_layer52(out_conv9, targets, img_dim)
+        temp, layer_loss = self.yolo_layer52(out_conv9, targets, image_size)
         loss += layer_loss
         yolo_outputs.append(temp)
 
         out = self.ep6(out_conv7)
         out_conv10 = self.conv10(out)
-        temp, layer_loss = self.yolo_layer26(out_conv10, targets, img_dim)
+        temp, layer_loss = self.yolo_layer26(out_conv10, targets, image_size)
         loss += layer_loss
         yolo_outputs.append(temp)
 
         out = self.ep7(out_conv5)
         out_conv11 = self.conv11(out)
-        temp, layer_loss = self.yolo_layer13(out_conv11, targets, img_dim)
+        temp, layer_loss = self.yolo_layer13(out_conv11, targets, image_size)
         loss += layer_loss
         yolo_outputs.append(temp)
 

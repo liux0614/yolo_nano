@@ -16,8 +16,8 @@ def _validate_bboxes(bboxes):
 
     if bboxes.ndimension() != 2:
         raise ValueError("Dimensions of bbox should be 2. Got {}".format(bboxes.ndimension()))
-    if bboxes.size(0) == 0:
-        raise ValueError("There should be at least one bounding box. Got {}".format(bboxes.size(0)))
+    # if bboxes.size(0) == 0:
+    #     raise ValueError("There should be at least one bounding box. Got {}".format(bboxes.size(0)))
     if bboxes.size(-1) != 5:
         raise ValueError("Last dimenion of bboxes should be 5 (including classes). Got {}".format(bboxes.size(-1)))
 
@@ -175,7 +175,7 @@ class BBox(object):
         w, h = self.size
         classes, xmin, ymin, xmax, ymax = self._split()
         transposed_xmin = w - xmax
-        transposed_xmax = w - xmin
+        transposed_xmax = w - xmin - 1e-4
 
         transposed_bboxes = torch.cat(
                 (classes, transposed_xmin, ymin, transposed_xmax, ymax), dim=-1)
@@ -195,7 +195,7 @@ class BBox(object):
 
     def transpose(self, method):
         if method not in (FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM):
-            raise NotImplementedError("Only horizontal and vertical flipping are supported")
+            raise NotImplementedError("Only horizontal and vertical flipping are supported. Got {}".format(method))
         
         if method == FLIP_LEFT_RIGHT:
             return self.hflip()

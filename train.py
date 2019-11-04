@@ -5,16 +5,17 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 def train(model, optimizer, dataloader, epoch, vis, opt):
-    for i, (imgs, targets) in enumerate(dataloader):
-        # assert False
+    for i, (images, targets) in enumerate(dataloader):
+        # targets: [idx, class_id, x, y, h, w] in yolo format
+        # idx is used to associate the bounding boxes with its image
         if not opt.no_cuda:
-            imgs_cpu = imgs.clone()
+            images_cpu = images.clone()
             model = model.to(opt.device)
-            imgs = Variable(imgs.to(opt.device))
+            images = Variable(images.to(opt.device))
             if targets is not None:
                 targets = Variable(targets.to(opt.device), requires_grad=False)
         
-        loss, yolo_outputs = model.forward(imgs, targets)
+        loss, yolo_outputs = model.forward(images, targets)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -23,7 +24,7 @@ def train(model, optimizer, dataloader, epoch, vis, opt):
         error26 = model.yolo_layer26.metrics
         error13 = model.yolo_layer13.metrics
         vis.print_current_losses([error52, error26, error13], epoch, i, len(dataloader))
-        vis.plot_current_visuals(imgs_cpu, yolo_outputs)
+        vis.plot_current_visuals(images_cpu, yolo_outputs)
 
     # save checkpoints
     if epoch % opt.checkpoint_interval == 0:

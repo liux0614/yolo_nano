@@ -1,12 +1,10 @@
 import random
 import math
 import numbers
-import numpy as np
 import torch
 from PIL import Image
 
 from torchvision.transforms import functional as F
-from . import functional as T
 from . import bounding_box 
 
 class Compose(object):
@@ -38,26 +36,18 @@ class Compose(object):
         format_string += '\n)'
         return format_string
 
-    def randomize_parameters(self):
-        pass
 
-class MultiScale(object):
-    """resize the image
+class RandomHorizontalFlip(object):
+    """horizontally flip the image and bounding boxes
     """
-    def __init__(self, size, interpolation=Image.BILINEAR):
-        self.size = size
-        self.min_size = size - 3*32
-        self.max_size = size + 3*32
-        self.interpolation = interpolation
-
+    def __init__(self, p=0.5):
+        self.p = p
 
     def __call__(self, image, bboxes):
-        size = random.choice(range(self.min_size, self.max_size + 1, 32))
-        resized_image = F.resize(image, (size, size), self.interpolation)
-        return resized_image, bboxes
-    
-    def randomize_parameters(self):
-        pass
+        if random.random() < self.p:
+            return F.hflip(image), bboxes.hflip()
+        else:
+            return image, bboxes
 
 class ToTensor(object):
     def __init__(self):
@@ -65,6 +55,3 @@ class ToTensor(object):
     
     def __call__(self, image, bboxes):
         return F.to_tensor(image), bboxes.to_tensor()
-    
-    def randomize_parameters(self):
-        pass

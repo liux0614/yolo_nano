@@ -272,15 +272,24 @@ def non_max_suppression(prediction, conf_thres=0.5, nms_thres=0.4):
 def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 
     #print(pred_boxes.size(), pred_cls.size(), target.size(), anchors.size())
+    pred_boxes = pred_boxes.clone().cpu()
+    pred_cls = pred_cls.clone().cpu()
+    target = target.clone().cpu()
+    anchors = anchors.clone().cpu()
 
-    ByteTensor = torch.cuda.ByteTensor if pred_boxes.is_cuda else torch.ByteTensor
-    FloatTensor = torch.cuda.FloatTensor if pred_boxes.is_cuda else torch.FloatTensor
+    #ByteTensor = torch.cuda.ByteTensor if pred_boxes.is_cuda else torch.ByteTensor
+    #FloatTensor = torch.cuda.FloatTensor if pred_boxes.is_cuda else torch.FloatTensor
+
+    ByteTensor = torch.ByteTensor
+    FloatTensor = torch.FloatTensor
 
     nB = pred_boxes.size(0)
     nA = pred_boxes.size(1)
     nC = pred_cls.size(-1)
     nG = pred_boxes.size(2)
 
+    # print(nB, nA, nC, nG)
+    
     # Output tensors
     obj_mask = ByteTensor(nB, nA, nG, nG).fill_(0)
     noobj_mask = ByteTensor(nB, nA, nG, nG).fill_(1)
@@ -309,6 +318,8 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
     gw, gh = gwh.t()
     gi, gj = gxy.long().t()
     # Set masks
+
+    # print(b, best_n, gj, gi)
     obj_mask[b, best_n, gj, gi] = 1
     noobj_mask[b, best_n, gj, gi] = 0
 
@@ -334,6 +345,18 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
     iou_scores[b, best_n, gj, gi] = bbox_iou(pred_boxes[b, best_n, gj, gi], target_boxes, x1y1x2y2=False)
 
     tconf = obj_mask.float()
+
+    iou_scores = iou_scores.cuda()
+    class_mask = class_mask.cuda()
+    obj_mask = obj_mask.cuda()
+    noobj_mask = noobj_mask.cuda()
+    tx = tx.cuda()
+    ty = ty.cuda()
+    tw = tw.cuda()
+    th = th.cuda()
+    tcls = tcls.cuda()
+    tconf = tconf.cuda()
+
     return iou_scores, class_mask, obj_mask, noobj_mask, tx, ty, tw, th, tcls, tconf
 
 def build_stage_one(pred_boxes, target, anchors, ignore_thres):

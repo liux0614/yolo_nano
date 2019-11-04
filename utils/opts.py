@@ -41,12 +41,18 @@ class Opt():
         self.parser.add_argument("--conf_thres", type=float, default=.8)
         self.parser.add_argument("--nms_thres", type=float, default=.5)
         self.parser.add_argument("--num_anchors", type=int, default=3, help="# of anchors in each perdiction")
-        self.parser.add_argument("--multiscale", default=True, help="allow for multi-scale training")
-        self.parser.add_argument("--hflip", default=True, help="horizontal flip ")
+        
+        self.parser.add_argument("--no_multi_scale", action="store_true", help="if true, no multi-scale augmentation")
+        self.parser.set_defaults(no_multi_scale=False)
+        self.parser.add_argument("--no_hflip", action="store_true", help="if true, no horizontal-flip augmentation")
+        self.parser.set_defaults(no_hflip=False)
+        self.parser.add_argument('--hflip_prob', type=float, default=.5, help="the probability of flipping the image and bboxes horozontally")
         # self.parser.add_argument("--compute_map", default=False, help="if True computes mAP every 10th batch")
 
-        self.parser.add_argument("--train", default=True, help="training")
-        self.parser.add_argument("--val", default=True, help="validation")
+        self.parser.add_argument("--no_train", action="store_true", help="training")
+        self.parser.set_defaults(no_train=False)
+        self.parser.add_argument("--no_val", action="store_true", help="validation")
+        self.parser.set_defaults(no_val=False)
         self.parser.add_argument("--test", default=False, help="test")
         
         self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns (for visulizer)")

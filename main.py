@@ -10,7 +10,7 @@ from torch.optim import lr_scheduler
 
 from data.get_dataset import get_training_dataset, get_validation_set
 from models.get_model import get_model
-from transforms.transforms import Compose, MultiScale, ToTensor
+from transforms.get_transforms import get_transforms
 from utils.opts import Opt
 from utils.visualizer import Visualizer
 from train import train
@@ -37,11 +37,9 @@ if __name__ == "__main__":
     ########################################
     #              Transforms              #
     ########################################
-    transforms = Compose([
-        MultiScale(opt.image_size), ToTensor()
-    ])
+    transforms = get_transforms(opt)
 
-    if opt.train:
+    if not opt.no_train:
         dataset = get_training_dataset(opt, transforms)
         dataloader = torch.utils.data.DataLoader(
             dataset,
@@ -64,7 +62,8 @@ if __name__ == "__main__":
     
     print('train model')
     for epoch in range(opt.begin_epoch, opt.num_epochs + 1):
-        train(model, optimizer, dataloader, epoch, vis, opt)
+        if not opt.no_train:
+            train(model, optimizer, dataloader, epoch, vis, opt)
 
 
         

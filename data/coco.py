@@ -1,7 +1,10 @@
 import os
+import random
 import torch
+import torch.nn.functional as F 
 import torch.utils.data as data
 import torchvision.transforms as transforms
+
 
 import numpy as np
 from PIL import Image
@@ -15,12 +18,14 @@ def pil_loader(path):
         with Image.open(f) as img:
             return img.convert('RGB')
 
-def load_annotation_data(data_file_path):
-    with open(data_file_path, 'r') as data_file:
-        return json.load(data_file)
+def resize(image, size, mode='nearest'):
+    image = F.interpolate(image.unsqueeze(0), size=size, mode=mode).squeeze(0)
+    return image
 
-def make_dataset(root_path, annotation_path, subset):
-    pass
+def hflip(images, targets):
+    images = torch.flip(images, [-1])
+    targets[:, 2] = 1 - targets[:, 2]
+    return images, targets
 
 
 # From https://github.com/yhenon/pytorch-retinanet/blob/master/dataloader.py
@@ -28,7 +33,7 @@ class COCO(data.Dataset):
     """Coco dataset."""
 
     def __init__(
-        self, root_path, annotation_path, subset='train', 
+        self, root_path, annotation_path, subset='train', image_size=416, multi_scale=True,
         transforms=None, get_loader=pil_loader):
         """
         Args:
@@ -39,8 +44,13 @@ class COCO(data.Dataset):
         self.root_path = root_path
         self.annotation_path = annotation_path
         self.subset = subset
+        self.image_size = image_size
+        self.multi_scale = multi_scale
         self.transforms = transforms
         self.loader = get_loader
+
+        self.min_image_size = self.image_size - 3 * 32
+        self.max_image_size = self.image_size + 3 * 32
 
         self.coco = coco.COCO(self.annotation_path)
         self.image_ids = self.coco.getImgIds()
@@ -79,7 +89,7 @@ class COCO(data.Dataset):
 
         targets = torch.zeros((len(bboxes), 6))
         targets[:, 1:] = bboxes
-        
+
         return image, targets
 
     def load_image(self, image_index):
@@ -116,7 +126,6 @@ class COCO(data.Dataset):
     def coco_label_to_label(self, coco_label):
         return self.coco_labels_inverse[coco_label]
 
-
     def label_to_coco_label(self, label):
         return self.coco_labels[label]
 
@@ -124,12 +133,19 @@ class COCO(data.Dataset):
         image = self.coco.loadImgs(self.image_ids[image_index])[0]
         return float(image['width']) / float(image['height'])
 
+    def resize(self, image, size, mode='bilinear'):
+        return F.interpolate(image, size=size, mode=mode).squeeze(0)
+
     def num_classes(self):
         return 80
 
     def collate_fn(self, batch):
         images, targets = list(zip(*batch))
-        images = torch.stack(images)
+        
+        #if self.multi_scale:
+        #    self.image_size = random.choice(range(self.min_image_size, self.max_image_size + 1, 32))
+        images = torch.stack([ resize(i, self.image_size) for i in images ])
+
         targets = [bboxes for bboxes in targets if bboxes is not None]
         for i, bboxes in enumerate(targets):
             bboxes[:, 0] = i
