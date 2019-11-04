@@ -175,7 +175,7 @@ class BBox(object):
         w, h = self.size
         classes, xmin, ymin, xmax, ymax = self._split()
         transposed_xmin = w - xmax
-        transposed_xmax = w - xmin - 1e-4
+        transposed_xmax = w - xmin - 1e-4 if xmin == 0 else w - xmin
 
         transposed_bboxes = torch.cat(
                 (classes, transposed_xmin, ymin, transposed_xmax, ymax), dim=-1)
@@ -186,7 +186,7 @@ class BBox(object):
         w, h = self.size
         classes, xmin, ymin, xmax, ymax = self._split()
         transposed_ymin = h - ymax
-        transposed_ymax = h - ymin
+        transposed_ymax = h - ymin - 1e4 if ymin == 0 else h - ymin
 
         transposed_bboxes = torch.cat(
                 (classes, xmin, transposed_ymin, xmax, transposed_ymax), dim=-1)
