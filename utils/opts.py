@@ -33,7 +33,7 @@ class Opt():
         self.parser.add_argument("--num_classes", type=int, default=80, help="# of classes of the dataset")
         self.parser.add_argument('--num_epochs', type=int, default=20, help='# of epochs')
         self.parser.add_argument('--begin_epoch', type=int, default=0, help='# of epochs')
-        self.parser.add_argument("--batch_size", type=int, default=1, help="batch size")
+        self.parser.add_argument("--batch_size", type=int, default=16, help="batch size")
         self.parser.add_argument('--lr', type=float, default=1e-4, help="divided by `lr_patience` while training by lr scheduler")
         self.parser.add_argument('--lr_patience', type=int, default=10, help="patience of LR scheduler -- ReduceLROnPlateau")
         
