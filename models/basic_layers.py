@@ -3,25 +3,36 @@ import torch.nn as nn
 from utils.stats import build_targets, to_cpu, non_max_suppression
 
 
-def conv1x1(input_channels, output_channels, stride=1):
+def conv1x1(input_channels, output_channels, stride=1, bn=True):
     # 1x1 convolution without padding
-    return nn.Sequential(
-        nn.Conv2d(
-            input_channels, output_channels, kernel_size=1,
-            stride=stride, bias=False),
-        nn.BatchNorm2d(output_channels),
-        nn.ReLU6(inplace=True)
-    )
+    if bn == True:
+        return nn.Sequential(
+            nn.Conv2d(
+                input_channels, output_channels, kernel_size=1,
+                stride=stride, bias=False),
+            nn.BatchNorm2d(output_channels),
+            nn.ReLU6(inplace=True)
+        )
+    else:
+        return nn.Conv2d(
+                input_channels, output_channels, kernel_size=1,
+                stride=stride, bias=False)
 
-def conv3x3(input_channels, output_channels, stride=1):
+
+def conv3x3(input_channels, output_channels, stride=1, bn=True):
     # 3x3 convolution with padding=1
-    return nn.Sequential(
+    if bn == True:
+        return nn.Sequential(
+            nn.Conv2d(
+                input_channels, output_channels, kernel_size=3,
+                stride=stride, padding=1, bias=False),
+            nn.BatchNorm2d(output_channels),
+            nn.ReLU6(inplace=True)
+        )
+    else:
         nn.Conv2d(
-            input_channels, output_channels, kernel_size=3,
-            stride=stride, padding=1, bias=False),
-        nn.BatchNorm2d(output_channels),
-        nn.ReLU6(inplace=True)
-    )
+                input_channels, output_channels, kernel_size=3,
+                stride=stride, padding=1, bias=False)
 
 def sepconv3x3(input_channels, output_channels, stride=1, expand_ratio=1):
     return nn.Sequential(

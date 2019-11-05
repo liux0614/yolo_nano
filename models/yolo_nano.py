@@ -63,17 +63,17 @@ class YOLONano(nn.Module):
         self.pep20 = PEP(197, 122, 58, stride=1) # output: 52x52x122
         self.pep21 = PEP(122, 87, 52, stride=1) # output: 52x52x87
         self.pep22 = PEP(87, 93, 47, stride=1) # output: 52x52x93
-        self.conv9 = conv1x1(93, self.yolo_channels, stride=1) # output: 52x52x yolo_channels
+        self.conv9 = conv1x1(93, self.yolo_channels, stride=1, bn=False) # output: 52x52x yolo_channels
         self.yolo_layer52 = YOLOLayer(anchors52, num_classes, img_dim=image_size)
 
         # conv7 -> ep6
         self.ep6 = EP(98, 183, stride=1) # output: 26x26x183
-        self.conv10 = conv1x1(183, self.yolo_channels, stride=1) # output: 26x26x yolo_channels
+        self.conv10 = conv1x1(183, self.yolo_channels, stride=1, bn=False) # output: 26x26x yolo_channels
         self.yolo_layer26 = YOLOLayer(anchors26, num_classes, img_dim=image_size)
 
         # conv5 -> ep7
         self.ep7 = EP(189, 462, stride=1) # output: 13x13x462
-        self.conv11 = conv1x1(462, self.yolo_channels, stride=1) # output: 13x13x yolo_channels
+        self.conv11 = conv1x1(462, self.yolo_channels, stride=1, bn=False) # output: 13x13x yolo_channels
         self.yolo_layer13 = YOLOLayer(anchors13, num_classes, img_dim=image_size)
 
     def forward(self, x, targets=None):
