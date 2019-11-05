@@ -49,6 +49,40 @@ class RandomHorizontalFlip(object):
         else:
             return image, bboxes
 
+
+class Resize(object):
+    """Resize image to a desired size
+    """
+    def __init__(self, size, interpolation=Image.BILINEAR):
+        assert isinstance(size, int) or (isinstance(size, Iterable) and len(size) == 2)
+        self.size = size
+        self.interpolation = interpolation
+
+    def __call__(self, image, bboxes):
+        return F.resize(image, self.size, self.interpolation), bboxes
+
+
+class PadToSquare(object):
+    """Pad image to square shape and adjust the bounding box coordinates
+    """
+    def __init__(self, fill=0, padding_mode='constant'):
+        assert isinstance(fill, (numbers.Number, str, tuple))
+        assert padding_mode in ['constant', 'edge', 'reflect', 'symmetric']
+        self.fill = fill
+        self.padding_mode = padding_mode
+
+    def __call__(self, image, bboxes):
+        w, h = image.size
+        if w == h:
+            return image, bboxes
+        
+        diff = abs(w - h)
+        padding_1, padding_2 = dim_diff // 2, dim_diff - dim_diff // 2
+        padding = (0, padding_1, 0, padding_2) if w > h else (padding_1, 0, padding_2, 0)
+        image = F.pad(image, padding, fill=self.fill, padding_mode=self.padding_mode)
+        bboxes = bboxes.pad(padding)
+        return image, bboxes
+
 class ToTensor(object):
     def __init__(self):
         pass

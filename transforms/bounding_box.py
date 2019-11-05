@@ -146,12 +146,14 @@ class BBox(object):
 
     
     def pad(self, padding):
+        # If len(padding) == 2: padding on left/right and top/bottom respectively
+        # If len(padding) == 4: padding on left, top, right and bottom respectively
         if isinstance(padding, numbers.Number):
-            left, right, top, down = padding, padding, padding, padding
+            left, top, right, bottom = padding, padding, padding, padding
         elif isinstance(padding, tuple) and len(padding) == 2:
-            left, right, top, down = padding[0], padding[0], padding[1], padding[1]
+            left, top, right, bottom = padding[0], padding[1], padding[0], padding[1]
         elif isinstance(padding, tuple) and len(padding) == 4:
-            left, right, top, down = padding
+            left, right, top, bottom = padding
         else:
             raise ValueError("Padding must be an int or a 2, or 4 element tuple, not a " +
                              "{} element tuple".format(len(padding)))
@@ -160,12 +162,12 @@ class BBox(object):
         padded_xmin += left
         padded_ymin += top
         padded_xmax += right
-        padded_ymax += down
+        padded_ymax += bottom
 
         padded_bboxes = torch.cat((classes, padded_xmin, padded_ymin, padded_xmax, padded_ymax), -1)
         w, h = self.size
         padded_w = w + left + right
-        padded_h = h + top + down
+        padded_h = h + top + bottom
 
         return BBox(padded_bboxes, (padded_w, padded_h))
 
