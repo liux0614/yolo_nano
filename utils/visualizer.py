@@ -28,7 +28,7 @@ class Visualizer():
         self.ncols = opt.ncols
         self.classname_path = opt.classname_path
         self.class_names = load_classe_names(self.classname_path)
-        assert len(class_names) == opt.num_classes
+        assert len(self.class_names) == opt.num_classes
         
         self.log_path = os.path.join(self.opt.checkpoint_path, 'log.txt')
 
