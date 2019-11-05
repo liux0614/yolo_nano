@@ -1,4 +1,5 @@
 datasets/*
+!datasets/coco/coco.names
 checkpoints/*
 
 # Byte-compiled / optimized / DLL files

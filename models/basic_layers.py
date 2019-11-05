@@ -113,7 +113,7 @@ class FCA(nn.Module):
         out = x * out.expand_as(x)
         return out
 
-
+# From https://github.com/eriklindernoren/PyTorch-YOLOv3
 class YOLOLayer(nn.Module):
     # detection layer
     def __init__(self, anchors, num_classes, img_dim=416):

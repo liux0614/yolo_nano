@@ -12,6 +12,11 @@ from PIL.ImageDraw import Draw
 
 import torchvision.transforms as transforms
 
+def load_classe_names(classname_path):
+    with open(classname_path, "r") as fp:
+        class_names = fp.read().split("\n")
+    return class_names
+
 def tensor2im(tensor):
     img_np = tensor.cpu().float().numpy()
     img = np.clip((np.transpose(img_np, (1,2,0)) ), 0,1)
@@ -21,29 +26,17 @@ class Visualizer():
     def __init__(self, opt):
         self.opt = opt
         self.ncols = opt.ncols
-        self.log_file_path = os.path.join(self.opt.checkpoint_path, 'log.txt')
-        with open(self.log_file_path, 'a') as log_file:
-            log_file.write('===================================Training Loss ============================\n')
+        self.classname_path = opt.classname_path
+        self.class_names = load_classe_names(self.classname_path)
+        assert len(class_names) == opt.num_classes
+        
+        self.log_path = os.path.join(self.opt.checkpoint_path, 'log.txt')
 
         self.viz = visdom.Visdom()
 
 
     def plot_target(self, imgs, targets):
         toImg = transforms.ToPILImage()
-        cls_name = [
-            'person', 'bicycle', 'car', 'motorcycle', 'airplane',
-            'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
-            'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse',
-            'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
-            'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
-            'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
-            'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass',
-            'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
-            'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake',
-            'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv',
-            'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
-            'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
-            'scissors', 'teddy bear', 'hair drier', 'toothbrush']
         for i in range(imgs.size(0)):
             img = toImg(imgs[i, ...])
             img = img.resize((540, 540))
@@ -78,7 +71,7 @@ class Visualizer():
         message += '------------------------------------------------------\n'
 
         print(message)
-        with open(self.log_file_path, 'a') as log_file:
+        with open(self.log_path, 'a') as log_file:
             log_file.write('%s\n' % message)
 
     # still has some bugs here
@@ -89,20 +82,6 @@ class Visualizer():
 
         idx = []
         i = 0
-        cls_name = [
-            'person', 'bicycle', 'car', 'motorcycle', 'airplane',
-            'bus', 'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
-            'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse',
-            'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
-            'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis',
-            'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove',
-            'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass',
-            'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich',
-            'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake',
-            'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv',
-            'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave',
-            'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase',
-            'scissors', 'teddy bear', 'hair drier', 'toothbrush']
         for detection in detections:
             if detection is not None:
                 idx.append(i)
@@ -132,7 +111,7 @@ class Visualizer():
                     y2 = min(int(y2), h)
                     draw.rectangle([(x1,y1), (x2,y2)], outline=(255,0,0))
                     #print(cls_pred)
-                    name = cls_name[int(cls_pred)]
+                    name = self.class_names[int(cls_pred)]
                     name += "=%.4f" % float(cls_conf)
                     f = ImageFont.truetype("fonts-japanese-gothic.ttf", 15)
                     draw.text((x1,y1), name, 'blue', font=f)
@@ -146,7 +125,6 @@ class Visualizer():
         img = img.resize((540, 540))
         draw = Draw(img)
         w, h = img.size 
-        cls_name = ['car', 'person', 'fire']
         for detection in detections:
             if detection is None:
                 print("no detection is detected")

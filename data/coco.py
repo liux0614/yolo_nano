@@ -61,7 +61,7 @@ class COCO(data.Dataset):
         # load class names (name -> label)
         categories = self.coco.loadCats(self.coco.getCatIds())
         categories.sort(key=lambda x: x['id'])
-
+        
         self.classes = {}
         self.coco_labels = {}
         self.coco_labels_inverse = {}

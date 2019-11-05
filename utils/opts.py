@@ -11,7 +11,7 @@ class Opt():
         # project root, dataset, checkpoint resume and pretrained model path
         self.parser.add_argument("--project_root", type=str, default=".", help="root directory path of project")
         self.parser.add_argument("--dataset_path", type=str, default="datasets/coco/jpg", help="directory path of dataset")
-        self.parser.add_argument("--annotation_path", type=str, default="datasets/coco/annotation/instances_val2017.json", help="directory path of annotations")
+        self.parser.add_argument("--annotation_path", type=str, default="datasets/coco/annotation/instances_val2017.json", help="file path of annotations")
         self.parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="directory path of checkpoints")
         self.parser.add_argument("--resume_path", type=str, default="", help="save data (.pth) of previous training")
         self.parser.add_argument("--pretrain_path", type=str, default="", help="path of pretrain model (.pth)")
@@ -40,7 +40,6 @@ class Opt():
         # object detection options
         self.parser.add_argument("--conf_thres", type=float, default=.8)
         self.parser.add_argument("--nms_thres", type=float, default=.5)
-        self.parser.add_argument("--num_anchors", type=int, default=3, help="# of anchors in each perdiction")
         
         self.parser.add_argument("--no_multi_scale", action="store_true", help="if true, no multi-scale augmentation")
         self.parser.set_defaults(no_multi_scale=False)
@@ -55,7 +54,9 @@ class Opt():
         self.parser.set_defaults(no_val=False)
         self.parser.add_argument("--test", default=False, help="test")
         
-        self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns (for visulizer)")
+        # visualizer
+        self.parser.add_argument("--classname_path", type=str, default="datasets/coco/coco.names", help="file path of classnames for visualizer")
+        self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns")
         self.parser.add_argument("--print_options", default=True, help="print options or not")
 
         self.initialized = True
