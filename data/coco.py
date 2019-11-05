@@ -81,7 +81,7 @@ class COCO(data.Dataset):
     def __getitem__(self, idx):
 
         image = self.load_image(idx)
-        bboxes = BBox.from_xyhw(self.load_annotations(idx), image.size)
+        bboxes = BBox.from_coco(self.load_annotations(idx), image.size)
         if self.transforms is not None:
             image, bboxes = self.transforms(image, bboxes)
         else:
@@ -96,7 +96,6 @@ class COCO(data.Dataset):
         image_info = self.coco.loadImgs(self.image_ids[image_index])[0]
         image_path = os.path.join(self.root_path, self.subset, image_info['file_name'])
         image = self.loader(image_path)
-
         return image
 
     def load_annotations(self, image_index):
@@ -121,6 +120,7 @@ class COCO(data.Dataset):
             annotations = np.append(annotations, annotation, axis=0)
 
         # [class, x, y, w, h]
+        # [x y] is the coordinate of the upper-left corner of the bbox
         return annotations
 
     def coco_label_to_label(self, coco_label):

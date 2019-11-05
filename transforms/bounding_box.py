@@ -49,6 +49,7 @@ class BBox(object):
 
     @staticmethod
     def from_xyhw(bboxes, image_size, normalized=False):
+        # x y is the center, not the upper-top corner
         bboxes = _validate_bboxes(bboxes)
         image_size = _validate_size(image_size)
         
@@ -64,6 +65,17 @@ class BBox(object):
     @staticmethod
     def from_yolo(bboxes, image_size):
         return BBox.from_xyhw(bboxes, image_size, normalized=True)
+
+    @staticmethod
+    def from_coco(bboxes, image_size):
+        bboxes = _validate_bboxes(bboxes)
+        image_size = _validate_size(image_size)
+        
+        classes, xmin, ymin, w, h = bboxes.split(1, dim=-1)
+        xmax = xmin + w
+        ymax = ymin + h
+        
+        return BBox(torch.cat((classes, xmin, ymin, xmax, ymax), dim=-1), image_size)
 
     def _split(self, mode='xyxy'):
         if mode == 'xyxy':
@@ -175,7 +187,7 @@ class BBox(object):
         w, h = self.size
         classes, xmin, ymin, xmax, ymax = self._split()
         transposed_xmin = w - xmax
-        transposed_xmax = w - xmin - 1e-4 if xmin == 0 else w - xmin
+        transposed_xmax = w - xmin
 
         transposed_bboxes = torch.cat(
                 (classes, transposed_xmin, ymin, transposed_xmax, ymax), dim=-1)
@@ -186,7 +198,7 @@ class BBox(object):
         w, h = self.size
         classes, xmin, ymin, xmax, ymax = self._split()
         transposed_ymin = h - ymax
-        transposed_ymax = h - ymin - 1e4 if ymin == 0 else h - ymin
+        transposed_ymax = h - ymin
 
         transposed_bboxes = torch.cat(
                 (classes, xmin, transposed_ymin, xmax, transposed_ymax), dim=-1)
