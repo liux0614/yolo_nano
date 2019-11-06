@@ -142,8 +142,8 @@ class COCO(data.Dataset):
     def collate_fn(self, batch):
         images, targets = list(zip(*batch))
         
-        #if self.multi_scale:
-        #    self.image_size = random.choice(range(self.min_image_size, self.max_image_size + 1, 32))
+        if self.multi_scale:
+           self.image_size = random.choice(range(self.min_image_size, self.max_image_size + 1, 32))
         images = torch.stack([ resize(i, self.image_size) for i in images ])
 
         targets = [bboxes for bboxes in targets if bboxes is not None]

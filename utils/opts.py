@@ -55,7 +55,7 @@ class Opt():
         self.parser.add_argument("--test", default=False, help="test")
         
         # visualizer
-        self.parser.add_argument("--classname_path", type=str, default="datasets/coco/coco.names", help="file path of classnames for visualizer")
+        self.parser.add_argument("--classname_path", type=str, default="datasets/coco.names", help="file path of classnames for visualizer")
         self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns")
         self.parser.add_argument("--print_options", default=True, help="print options or not")
 

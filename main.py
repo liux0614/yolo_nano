@@ -1,19 +1,19 @@
 import os
-import sys
-import json
-import numpy as np
-import torch
 import time
+import torch
 from torch import nn
 from torch import optim
 from torch.optim import lr_scheduler
 
-from data.get_dataset import get_training_dataset, get_validation_set
+from data.get_dataset import get_train_dataset, get_val_dataset
 from models.get_model import get_model
-from transforms.get_transforms import get_transforms
+from transforms.get_transforms import get_train_transforms, get_val_transforms
+
 from utils.opts import Opt
 from utils.visualizer import Visualizer
+
 from train import train
+from val import val
 
 if __name__ == "__main__":
 
@@ -37,10 +37,9 @@ if __name__ == "__main__":
     ########################################
     #              Transforms              #
     ########################################
-    transforms = get_transforms(opt)
-
     if not opt.no_train:
-        dataset = get_training_dataset(opt, transforms)
+        transforms = get_train_transforms(opt)
+        dataset = get_train_dataset(opt, transforms)
         dataloader = torch.utils.data.DataLoader(
             dataset,
             batch_size=opt.batch_size,
@@ -48,6 +47,9 @@ if __name__ == "__main__":
             num_workers=opt.num_threads,
             collate_fn=dataset.collate_fn
         )
+    
+    # if not opt.no_val:
+    #     dataset = get_val_dataset(opt, transforms)
 
     if opt.resume_path:
         print('loading checkpoint {}'.format(opt.resume_path))
@@ -59,11 +61,17 @@ if __name__ == "__main__":
         if not opt.no_train:
             optimizer.load_state_dict(checkpoint['optimizer'])
 
-    
-    print('train model')
+
+    ########################################
+    #           Train, Val, Test           #
+    ########################################    
     for epoch in range(opt.begin_epoch, opt.num_epochs + 1):
         if not opt.no_train:
             train(model, optimizer, dataloader, epoch, vis, opt)
 
+        if not opt.no_val:
+            val(model, optimizer, dataloader, epoch, vis, opt)
 
-        
+    
+    if opt.test:
+        pass

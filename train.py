@@ -1,7 +1,6 @@
 import  os
 import torch
 import torch.nn as nn 
-import torch.nn.functional as F 
 from torch.autograd import Variable
 
 def train(model, optimizer, dataloader, epoch, vis, opt):
