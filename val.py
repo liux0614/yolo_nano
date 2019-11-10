@@ -1,34 +1,46 @@
 import  os
+import numpy as np
 import torch
-import torch.nn as nn 
+import torch.nn as nn
 from torch.autograd import Variable
+from terminaltables import AsciiTable
 
-from utils.stats import non_max_suppression, to_cpu, rescale_boxes, xywh2xyxy, get_batch_statistics, ap_per_class
+from utils.stats import (
+    non_max_suppression, to_cpu, xywh2xyxy, 
+    get_batch_statistics, ap_per_class, load_classe_names)
 
 
 @torch.no_grad()
-def val(model, optimizer, dataloader, epoch, vis, opt):
+def val(model, optimizer, dataloader, epoch, opt, val_logger, visualizer=None):
+    labels = []
+    sample_matrics = []
     for i, (images, targets) in enumerate(dataloader):
         labels += targets[:, 1].tolist()
         targets[:, 2:] = xywh2xyxy(targets[:, 2:])
-        targets[:, 2:] *= opt.img_size
+        targets[:, 2:] *= opt.image_size
 
-        loss, yolo_outputs = model.forward(images, targets)
+        outputs = model.forward(images)
         outputs = non_max_suppression(outputs, opt.conf_thres, opt.nms_thres)
-
-        error52 = model.yolo_layer52.metrics
-        error26 = model.yolo_layer26.metrics
-        error13 = model.yolo_layer13.metrics
-        vis.print_current_losses([error52, error26, error13], epoch, i, len(dataloader))
-        vis.plot_current_visuals(images_cpu, yolo_outputs)
-        
         sample_matrics += get_batch_statistics(outputs, targets, iou_threshold=0.5)
+
+        if visualizer is not None:
+            vis.plot_current_visuals(images, outputs)
     
     true_positives, pred_scores, pred_labels = [np.concatenate(x, 0) for x in list(zip(*sample_matrics))]
     precision, recall, AP, f1, ap_class = ap_per_class(true_positives, pred_scores, pred_labels, labels)
-
-    print("Average Precision for Val:")
+    
+    # logging
+    metric_table_data = [
+        ['Metrics', 'Value'], ['precision', precision.mean()], ['recall', recall.mean()], 
+        ['f1', f1.mean()], ['mAP', AP.mean()]]
+     
+    metric_table = AsciiTable(
+            metric_table_data,
+            title='[Epoch {:d}/{:d}'.format(epoch, opt.num_epochs))
+    print('{}\n\n\n'.format(metric_table.table))
+    
+    class_names = load_classe_names(opt.classname_path)
     for i, c in enumerate(ap_class):
-        print('Class %s - AP: %.4f' % (class_names[c], AP[i]))
-
-    print('mAP: %.4f' % (AP.mean()))
+        metric_table_data += [['AP-{}'.format(class_names[c]), AP[i]]]
+    metric_table.table_data = metric_table_data
+    val_logger.write('{}\n\n\n'.format(metric_table.table))

@@ -35,7 +35,7 @@ class Opt():
         self.parser.add_argument('--begin_epoch', type=int, default=0, help='# of epochs')
         self.parser.add_argument("--batch_size", type=int, default=16, help="batch size")
         self.parser.add_argument('--lr', type=float, default=1e-4, help="divided by `lr_patience` while training by lr scheduler")
-        self.parser.add_argument('--lr_patience', type=int, default=10, help="patience of LR scheduler -- ReduceLROnPlateau")
+        self.parser.add_argument('--gradient_accumulations', type=int, default=1, help="number of gradient accums before step")
         
         # object detection options
         self.parser.add_argument("--conf_thres", type=float, default=.8)
@@ -55,6 +55,8 @@ class Opt():
         self.parser.add_argument("--test", default=False, help="test")
         
         # visualizer
+        self.parser.add_argument("--no_vis", action="store_true", help="if true, no visualization")
+        self.parser.set_defaults(no_vis=False)
         self.parser.add_argument("--classname_path", type=str, default="datasets/coco.names", help="file path of classnames for visualizer")
         self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns")
         self.parser.add_argument("--print_options", default=True, help="print options or not")
@@ -88,12 +90,8 @@ class Opt():
                 self.opt.pretrain_path = os.path.join(self.opt.project_root, self.opt.pretrain_path)
 
         os.makedirs(self.opt.checkpoint_path, exist_ok=True)
-        os.makedirs(self.opt.checkpoint_path, exist_ok=True)
 
         self.opt.device = torch.device('cpu') if self.opt.no_cuda else torch.device('cuda')
-
-        #self.opt.anchors = [[10,13], [16,30], [33,23], [30, 61], [62, 45], [59, 119], [116, 90], [156, 198], [373, 326]]
-        # self.opt.class_names = ['car', 'person', 'fire']
 
         if self.opt.print_options:
             self.print_options()

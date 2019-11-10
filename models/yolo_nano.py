@@ -140,7 +140,7 @@ class YOLONano(nn.Module):
         loss += layer_loss
         yolo_outputs.append(temp)
 
-        yolo_outputs = to_cpu(torch.cat(yolo_outputs,1))
+        yolo_outputs = to_cpu(torch.cat(yolo_outputs, 1))
 
         return yolo_outputs if targets is None else (loss, yolo_outputs)
 

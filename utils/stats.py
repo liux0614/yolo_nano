@@ -14,15 +14,6 @@ def to_cpu(tensor):
     return tensor.detach().cpu()
 
 
-def load_classes(path):
-    """
-    Loads class labels at 'path'
-    """
-    fp = open(path, "r")
-    names = fp.read().split("\n")[:-1]
-    return names
-
-
 def weights_init_normal(m):
     classname = m.__class__.__name__
     if classname.find("Conv") != -1:
@@ -30,23 +21,6 @@ def weights_init_normal(m):
     elif classname.find("BatchNorm2d") != -1:
         torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
         torch.nn.init.constant_(m.bias.data, 0.0)
-
-
-def rescale_boxes(boxes, current_dim, original_shape):
-    """ Rescales bounding boxes to the original shape """
-    orig_h, orig_w = original_shape
-    # The amount of padding that was added
-    pad_x = max(orig_h - orig_w, 0) * (current_dim / max(original_shape))
-    pad_y = max(orig_w - orig_h, 0) * (current_dim / max(original_shape))
-    # Image height and width after padding is removed
-    unpad_h = current_dim - pad_y
-    unpad_w = current_dim - pad_x
-    # Rescale bounding boxes to dimension of original image
-    boxes[:, 0] = ((boxes[:, 0] - pad_x // 2) / unpad_w) * orig_w
-    boxes[:, 1] = ((boxes[:, 1] - pad_y // 2) / unpad_h) * orig_h
-    boxes[:, 2] = ((boxes[:, 2] - pad_x // 2) / unpad_w) * orig_w
-    boxes[:, 3] = ((boxes[:, 3] - pad_y // 2) / unpad_h) * orig_h
-    return boxes
 
 
 def xywh2xyxy(x):
@@ -57,6 +31,12 @@ def xywh2xyxy(x):
     y[..., 3] = x[..., 1] + x[..., 3] / 2
     return y
 
+
+def load_classe_names(classname_path):
+    with open(classname_path, "r") as fp:
+        class_names = fp.read().split("\n")
+    return class_names
+    
 
 def ap_per_class(tp, conf, pred_cls, target_cls):
     """ Compute the average precision, given the recall and precision curves.
@@ -79,7 +59,7 @@ def ap_per_class(tp, conf, pred_cls, target_cls):
 
     # Create Precision-Recall curve and compute AP for each class
     ap, p, r = [], [], []
-    for c in tqdm.tqdm(unique_classes, desc="Computing AP"):
+    for c in unique_classes:
         i = pred_cls == c
         n_gt = (target_cls == c).sum()  # Number of ground truth objects
         n_p = i.sum()  # Number of predicted objects
@@ -359,47 +339,4 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 
     return iou_scores, class_mask, obj_mask, noobj_mask, tx, ty, tw, th, tcls, tconf
 
-def build_stage_one(pred_boxes, target, anchors, ignore_thres):
-    ByteTensor = torch.cuda.ByteTensor if pred_boxes.is_cuda else torch.ByteTensor
-    FloatTensor = torch.cuda.FloatTensor if pred_boxes.is_cuda else torch.FloatTensor
 
-    nB = pred_boxes.size(0)
-    nA = pred_boxes.size(1)
-    #nC = pred_boxes.size(-1)
-    nG = pred_boxes.size(2)
-
-    # output tensors
-    obj_mask = ByteTensor(nB, nA, nG, nG).fill_(0)
-    noobj_mask = ByteTensor(nB, nA, nG, nG).fill_(1)
-    #class_mask = FloatTensor(nB, nA, nG, nG).fill_(0)
-    iou_scores = FloatTensor(nB, nA, nG, nG).fill_(0)
-    tx = FloatTensor(nB, nA, nG, nG).fill_(0)
-    ty = FloatTensor(nB, nA, nG, nG).fill_(0)
-
-    target_boxes = target[:, 2:6] * nG
-    gxy = target_boxes[:, :2]
-    gwh = target_boxes[:, 2:]
-    # anchors with best iou
-    ious = torch.stack([bbox_wh_iou(anchor, gwh) for anchor in anchors])
-    best_ious, best_n = ious.max(0)
-    # separate target values
-    b, target_labels = target[:, :2].long().t()
-    gx, gy = gxy.t()
-    #gw, gh = gwh.t()
-    gi, gj = gxy.long().t()
-    # set masks
-    obj_mask[b, best_n, gj, gi] = 1
-    noobj_mask[b, best_n, gj, gi] = 0
-
-    # set noobj mask to zero where iou_exceeds ignore threshold
-    for i, anchor_ious in enumerate(ious.t()):
-        noobj_mask[b[i], anchor_ious > ignore_thres, gj[i], gi[i]] = 0
-
-    tx[b, best_n, gj, gi] = gx - gx.floor()
-    ty[b, best_n, gj, gi] = gy - gy.floor()
-
-    #class_mask[b, best_n, gj, gi] = (pred_cls[b, best_n, gj, gi].argmax(-1) == target_labels).float()
-    iou_scores[b, best_n, gj, gi] = bbox_iou(pred_boxes[b, best_n, gj, gi], target_boxes, x1y1x2y2=False)
-
-    tconf = obj_mask.float()
-    return iou_scores, obj_mask, noobj_mask, tx, ty, tconf

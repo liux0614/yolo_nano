@@ -4,7 +4,7 @@ import visdom
 
 import torch
 
-from .stats import non_max_suppression, to_cpu, rescale_boxes
+from .stats import non_max_suppression, to_cpu, load_classe_names
 import random
 
 from PIL import Image, ImageFont
@@ -12,10 +12,7 @@ from PIL.ImageDraw import Draw
 
 import torchvision.transforms as transforms
 
-def load_classe_names(classname_path):
-    with open(classname_path, "r") as fp:
-        class_names = fp.read().split("\n")
-    return class_names
+
 
 def tensor2im(tensor):
     img_np = tensor.cpu().float().numpy()
@@ -62,17 +59,8 @@ class Visualizer():
         img = img.resize((480, 270))
         self.viz.image(np.array(img).transpose((2,0,1)), win=1)
 
-    def print_current_losses(self, error_ret, epoch, cur_iter, total_iter):
-        metrics = ['loss', 'x', 'y', 'w', 'h', 'conf','cls', 'cls_acc', 'recall50', 'recall75', 'precision', 'conf_obj', 'conf_noobj', 'grid_size']
-        message = '\n----------[Epoch %d/%d, Batch %d/%d] -----------------\n' % (epoch, self.opt.num_epochs, cur_iter, total_iter)
-        
-        for key in metrics:
-            message += '{:>10}\t{:>10.4f}\t{:10.4f}\t{:10.4f}\n'.format(key, error_ret[0][key], error_ret[1][key], error_ret[2][key])
-        message += '------------------------------------------------------\n'
-
-        print(message)
-        with open(self.log_path, 'a') as log_file:
-            log_file.write('%s\n' % message)
+    def plot_metrics(self, metrics):
+        pass
 
     # still has some bugs here
     def plot_current_visuals(self, imgs, detections):
