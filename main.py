@@ -19,8 +19,6 @@ from val import val
 if __name__ == "__main__":
 
     opt = Opt().parse()
-    with open(os.path.join(opt.checkpoint_path, 'opts.json'), 'w') as opt_file:
-        json.dump(vars(opt), opt_file)
 
     ########################################
     #                 Model                #

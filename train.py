@@ -22,14 +22,13 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         loss.backward()
 
         if batches_done % opt.gradient_accumulations == 0:
-            # accumulates gradient before each step
             optimizer.step()
             optimizer.zero_grad()
 
         # logging
         metric_keys = model.yolo_layer52.metrics.keys()
         yolo_metrics = [model.yolo_layer52.metrics, model.yolo_layer26.metrics, model.yolo_layer13.metrics]
-        metric_table_data = [['Metrics', 'YOLO Layer 52', 'YOLO Layer 26', 'YOLO Layer 13']]
+        metric_table_data = [['Metrics', 'YOLO Layer 0', 'YOLO Layer 1', 'YOLO Layer 2']]
         formats = {m: '%.6f' for m in metric_keys}
         for metric in metric_keys:
             row_metrics = [formats[metric] % ym.get(metric, 0) for ym in yolo_metrics]
@@ -43,13 +42,17 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         logger.print_and_write('{}\n\n\n'.format(metric_table.table))
         
         if visualizer is not None:
+            # plot prediction
+            # plot ground truth
+            visualizer.plot_visuals(images.detach().numpy(), targets.numpy(), env='main', name='gt')
             metrics_to_vis = []
-            for j, ym in enumerate(yolo_metrics):
-                for key, metric in ym.items():
-                    if ym != 'grid_size':
-                        metrics_to_vis += [('{}_yolo_layer_{}'.format(key, j), metric)]
-                metrics_to_vis += [('total_loss', loss.item())]
-            visualizer.plot_current_visuals(images_cpu, yolo_outputs)
+            # uncomment code below to plot the metrics of each YOLO layer
+            # for j, ym in enumerate(yolo_metrics):
+            #     for key, metric in ym.items():
+            #         if key != 'grid_size':
+            #             metrics_to_vis += [('{}_yolo_layer_{}'.format(key, j), metric)]
+            metrics_to_vis += [('total_loss', loss.item())]
+            visualizer.plot_metrics(metrics_to_vis, batches_done, env='main')
 
     # save checkpoints
     if epoch % opt.checkpoint_interval == 0:

@@ -1,6 +1,7 @@
-import argparse
 import os
+import json
 import torch
+import argparse
 
 class Opt():
     def __init__(self):
@@ -58,7 +59,6 @@ class Opt():
         self.parser.add_argument("--no_vis", action="store_true", help="if true, no visualization")
         self.parser.set_defaults(no_vis=False)
         self.parser.add_argument("--classname_path", type=str, default="datasets/coco.names", help="file path of classnames for visualizer")
-        self.parser.add_argument("--ncols", type=int, default=5, help="images to show each columns")
         self.parser.add_argument("--print_options", default=True, help="print options or not")
 
         self.initialized = True
@@ -90,6 +90,9 @@ class Opt():
                 self.opt.pretrain_path = os.path.join(self.opt.project_root, self.opt.pretrain_path)
 
         os.makedirs(self.opt.checkpoint_path, exist_ok=True)
+        
+        with open(os.path.join(self.opt.checkpoint_path, 'opts.json'), 'w') as opt_file:
+            json.dump(vars(self.opt), opt_file)
 
         self.opt.device = torch.device('cpu') if self.opt.no_cuda else torch.device('cuda')
 
