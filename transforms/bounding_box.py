@@ -49,7 +49,7 @@ class BBox(object):
 
     @staticmethod
     def from_xyhw(bboxes, image_size, normalized=False):
-        # x y is the center, not the upper-top corner
+        # x y is the center, not the lower-bottom corner
         bboxes = _validate_bboxes(bboxes)
         image_size = _validate_size(image_size)
         
@@ -89,11 +89,14 @@ class BBox(object):
             return classes, tx, ty, w, h
 
     def to_tensor(self, mode='yolo'):
-        if mode not in ('yolo', 'xyhw', 'xyxy'):
-            raise ValueError("BBox only supports mode: `yolo`, `xyhw`, `xyxy`. Got {}".format(mode))
+        if mode not in ('yolo', 'xyhw', 'xyxy', 'coco'):
+            raise ValueError("BBox only supports mode: `yolo`, `xyhw`, `xyxy`, `coco`. Got {}".format(mode))
 
         if mode == 'xyxy':
             return self.bboxes
+        elif mode == 'coco':
+            classes, xmin, ymin, xmax, ymax = self._split()
+            return torch.cat((classes, xmin, ymin, xmax-xmin, ymax-ymin), -1)
         else:
             w_factor, h_factor = self.size if mode == 'yolo' else (1, 1)
             classes, xmin, ymin, xmax, ymax = self._split()
@@ -104,8 +107,12 @@ class BBox(object):
         
             return torch.cat((classes, tx, ty, w, h), -1)
 
-    def to_yolo(self):
-        return self.to_tensor(mdde='yolo')   
+    def to_numpy(self, mode='yolo'):
+        if mode not in ('yolo', 'xyhw', 'xyxy', 'coco'):
+            raise ValueError("BBox only supports mode: `yolo`, `xyhw`, `xyxy`, `coco`. Got {}".format(mode))
+
+        if mode == 'xyxy':
+            return self.bboxes.numpy()
 
 
     def crop(self, box):

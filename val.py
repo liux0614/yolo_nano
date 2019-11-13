@@ -19,12 +19,14 @@ def val(model, optimizer, dataloader, epoch, opt, val_logger, visualizer=None):
         targets[:, 2:] = xywh2xyxy(targets[:, 2:])
         targets[:, 2:] *= opt.image_size
 
-        outputs = model.forward(images)
-        outputs = non_max_suppression(outputs, opt.conf_thres, opt.nms_thres)
-        sample_matrics += get_batch_statistics(outputs, targets, iou_threshold=0.5)
+        detections = model.forward(images)
+        detections = non_max_suppression(detections, opt.conf_thres, opt.nms_thres)
+        sample_matrics += get_batch_statistics(detections, targets, iou_threshold=0.5)
 
-        if visualizer is not None:
-            vis.plot_current_visuals(images, outputs)
+        if visualizer is not None and not opt.no_vis_preds:
+            visualizer.plot_predictions(images.cpu(), detections.cpu(), env='main') # plot prediction
+        if visualizer is not None and not opt.no_vis_gt:
+            visualizer.plot_ground_truth(images.cpu(), targets.cpu(), env='main') # plot ground truth
     
     true_positives, pred_scores, pred_labels = [np.concatenate(x, 0) for x in list(zip(*sample_matrics))]
     precision, recall, AP, f1, ap_class = ap_per_class(true_positives, pred_scores, pred_labels, labels)
@@ -44,3 +46,5 @@ def val(model, optimizer, dataloader, epoch, opt, val_logger, visualizer=None):
         metric_table_data += [['AP-{}'.format(class_names[c]), AP[i]]]
     metric_table.table_data = metric_table_data
     val_logger.write('{}\n\n\n'.format(metric_table.table))
+
+    vis.plot_metrics(images, detections)

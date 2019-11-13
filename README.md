@@ -8,8 +8,9 @@ YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 - [x] Add checkpoint support
 - [x] Add COCO dataset support (Code still needs cleaning. I'm working on it.)
 - [x] Add _multi scale_ and _horizontal flip_ transforms
-- [ ] Reconstruct the code of visualizer
-- [ ] Add val and test
+- [x] Reconstruct the code of visualizer
+- [x] Add val
+- [ ] Add test
 - [ ] Test accuracy
 
 # Project Structure

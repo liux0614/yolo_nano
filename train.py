@@ -8,9 +8,13 @@ from terminaltables import AsciiTable
 
 def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
     for i, (images, targets) in enumerate(dataloader):
-        batches_done = len(dataloader) * epoch + i
         # targets: [idx, class_id, x, y, h, w] in yolo format
         # idx is used to associate the bounding boxes with its image
+        # skip images without bounding boxes (mainly because coco has unlabelled images) 
+        if targets.size(0) == 0:
+            continue
+        
+        batches_done = len(dataloader) * epoch + i
         if not opt.no_cuda:
             images_cpu = images.clone()
             model = model.to(opt.device)
@@ -18,7 +22,7 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
             if targets is not None:
                 targets = Variable(targets.to(opt.device), requires_grad=False)
         
-        loss, yolo_outputs = model.forward(images, targets)
+        loss, detections = model.forward(images, targets)
         loss.backward()
 
         if batches_done % opt.gradient_accumulations == 0:
@@ -41,18 +45,19 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         metric_table.inner_footing_row_border = True
         logger.print_and_write('{}\n\n\n'.format(metric_table.table))
         
-        if visualizer is not None:
-            # plot prediction
-            # plot ground truth
-            # visualizer.plot_visuals(images.detach().numpy(), targets.numpy(), env='main', name='gt')
-            metrics_to_vis = []
-            # uncomment code below to plot the metrics of each YOLO layer
-            # for j, ym in enumerate(yolo_metrics):
-            #     for key, metric in ym.items():
-            #         if key != 'grid_size':
-            #             metrics_to_vis += [('{}_yolo_layer_{}'.format(key, j), metric)]
-            metrics_to_vis += [('total_loss', loss.item())]
-            visualizer.plot_metrics(metrics_to_vis, batches_done, env='main')
+        if visualizer is not None and not opt.no_vis_preds:
+            visualizer.plot_predictions(images.cpu(), detections.cpu(), env='train') # plot prediction
+        if visualizer is not None and not opt.no_vis_gt:
+            visualizer.plot_ground_truth(images.cpu(), targets.cpu(), env='train') # plot ground truth
+        
+        metrics_to_vis = []
+        # uncomment code below to plot the metrics of each YOLO layer
+        # for j, ym in enumerate(yolo_metrics):
+        #     for key, metric in ym.items():
+        #         if key != 'grid_size':
+        #             metrics_to_vis += [('{}_yolo_layer_{}'.format(key, j), metric)]
+        metrics_to_vis += [('total_loss', loss.item())]
+        visualizer.plot_metrics(metrics_to_vis, batches_done, env='loss')
 
     # save checkpoints
     if epoch % opt.checkpoint_interval == 0:
