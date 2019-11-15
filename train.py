@@ -24,7 +24,7 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
                 targets = Variable(targets.to(opt.device), requires_grad=False)
         
         loss, detections = model.forward(images, targets)
-        detections = non_max_suppression(detections, opt.conf_thres, opt.nms_thres)
+        detections = non_max_suppression(detections.cpu(), opt.conf_thres, opt.nms_thres)
         loss.backward()
 
         if batches_done % opt.gradient_accumulations == 0 or i == len(dataloader)-1:
@@ -48,7 +48,7 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         logger.print_and_write('{}\n\n\n'.format(metric_table.table))
         
         if visualizer is not None and not opt.no_vis_preds:
-            visualizer.plot_predictions(images.cpu(), detections.cpu(), env='train') # plot prediction
+            visualizer.plot_predictions(images.cpu(), detections, env='train') # plot prediction
         if visualizer is not None and not opt.no_vis_gt:
             visualizer.plot_ground_truth(images.cpu(), targets.cpu(), env='train') # plot ground truth
         

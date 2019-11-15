@@ -31,11 +31,11 @@ def test(model, dataloader, epoch, opt, test_logger, visualizer=None):
         targets[:, 2:] *= opt.image_size
 
         detections = model.forward(images)
-        detections = non_max_suppression(detections, opt.conf_thres, opt.nms_thres)
+        detections = non_max_suppression(detections.cpu(), opt.conf_thres, opt.nms_thres)
         sample_matrics += get_batch_statistics(detections, targets, iou_threshold=0.5)
 
         if visualizer is not None and not opt.no_vis_preds:
-            visualizer.plot_predictions(images.cpu(), detections.cpu(), env='main') # plot prediction
+            visualizer.plot_predictions(images.cpu(), detections, env='main') # plot prediction
         if visualizer is not None and not opt.no_vis_gt:
             visualizer.plot_ground_truth(images.cpu(), targets.cpu(), env='main') # plot ground truth
     
@@ -58,4 +58,4 @@ def test(model, dataloader, epoch, opt, test_logger, visualizer=None):
     metric_table.table_data = metric_table_data
     test_logger.write('{}\n\n\n'.format(metric_table.table))
 
-    vis.plot_metrics(images, detections)
+    vis.plot_metrics(metric_table_data, batches_done, env='loss')
