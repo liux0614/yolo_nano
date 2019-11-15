@@ -48,9 +48,9 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         logger.print_and_write('{}\n\n\n'.format(metric_table.table))
         
         if visualizer is not None and not opt.no_vis_preds:
-            visualizer.plot_predictions(images.cpu(), detections, env='train') # plot prediction
+            visualizer.plot_predictions(images.cpu(), detections, env='main') # plot prediction
         if visualizer is not None and not opt.no_vis_gt:
-            visualizer.plot_ground_truth(images.cpu(), targets.cpu(), env='train') # plot ground truth
+            visualizer.plot_ground_truth(images.cpu(), targets.cpu(), env='main') # plot ground truth
         
         metrics_to_vis = []
         # uncomment code below to plot the metrics of each YOLO layer
