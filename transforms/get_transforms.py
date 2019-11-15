@@ -17,3 +17,11 @@ def get_val_transforms(opt):
     trasforms.append(ToTensor())
 
     return Compose(trasforms)
+
+
+def get_test_transforms(opt):
+    trasforms = []
+
+    trasforms.append(ToTensor())
+
+    return Compose(trasforms)

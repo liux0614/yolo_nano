@@ -11,7 +11,7 @@ from utils.stats import (
 
 
 @torch.no_grad()
-def val(model, dataloader, epoch, opt, val_logger, visualizer=None):
+def test(model, dataloader, epoch, opt, val_logger, visualizer=None):
     labels = []
     sample_matrics = []
     for i, (images, targets) in enumerate(dataloader):
@@ -25,7 +25,7 @@ def val(model, dataloader, epoch, opt, val_logger, visualizer=None):
             images = Variable(images.to(opt.device))
             if targets is not None:
                 targets = Variable(targets.to(opt.device), requires_grad=False)
-        
+
         labels += targets[:, 1].tolist()
         targets[:, 2:] = xywh2xyxy(targets[:, 2:])
         targets[:, 2:] *= opt.image_size
@@ -58,4 +58,4 @@ def val(model, dataloader, epoch, opt, val_logger, visualizer=None):
     metric_table.table_data = metric_table_data
     val_logger.write('{}\n\n\n'.format(metric_table.table))
 
-    vis.plot_metrics(metric_table_data, batches_done, env='loss')
+    vis.plot_metrics(images, detections)

@@ -5,9 +5,9 @@ import torch
 from torch import nn
 from torch import optim
 
-from data.get_dataset import get_train_dataset, get_val_dataset
 from models.get_model import get_model
-from transforms.get_transforms import get_train_transforms, get_val_transforms
+from data.get_dataset import get_train_dataset, get_val_dataset, get_test_dataset
+from transforms.get_transforms import get_train_transforms, get_val_transforms, get_test_transforms
 
 from utils.opts import Opt
 from utils.logger import Logger
@@ -15,6 +15,7 @@ from utils.visualizer import Visualizer
 
 from train import train
 from val import val
+from test import test
 
 if __name__ == "__main__":
 
@@ -65,6 +66,19 @@ if __name__ == "__main__":
         )
         val_logger = Logger(os.path.join(opt.checkpoint_path, 'val.log'))
 
+
+    if opt.test:
+        test_transforms = get_test_transforms(opt)
+        dataset = get_test_dataset(opt, test_transforms)
+        dataloader = torch.utils.data.DataLoader(
+            dataset,
+            batch_size=opt.batch_size,
+            shuffle=False,
+            num_workers=opt.num_threads,
+            collate_fn=dataset.collate_fn
+        )
+        val_logger = Logger(os.path.join(opt.checkpoint_path, 'test.log'))
+
     if opt.resume_path:
         print('loading checkpoint {}'.format(opt.resume_path))
         checkpoint = torch.load(opt.resume_path)
@@ -86,8 +100,8 @@ if __name__ == "__main__":
 
         if not opt.no_val:
             print("\n---- Evaluating Model ----")
-            val(model, optimizer, dataloader, epoch, opt, val_logger, visualizer)
+            val(model, dataloader, epoch, opt, val_logger, visualizer)
 
     
     if opt.test:
-        pass
+        test(model, dataloader, epoch, opt, val_logger, visualizer)

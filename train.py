@@ -5,6 +5,8 @@ from torch.autograd import Variable
 
 from terminaltables import AsciiTable
 
+from utils.stats import non_max_suppression
+
 
 def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
     for i, (images, targets) in enumerate(dataloader):
@@ -16,16 +18,16 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         
         batches_done = len(dataloader) * epoch + i
         if not opt.no_cuda:
-            images_cpu = images.clone()
             model = model.to(opt.device)
             images = Variable(images.to(opt.device))
             if targets is not None:
                 targets = Variable(targets.to(opt.device), requires_grad=False)
         
         loss, detections = model.forward(images, targets)
+        detections = non_max_suppression(detections, opt.conf_thres, opt.nms_thres)
         loss.backward()
 
-        if batches_done % opt.gradient_accumulations == 0:
+        if batches_done % opt.gradient_accumulations == 0 or i == len(dataloader)-1:
             optimizer.step()
             optimizer.zero_grad()
 

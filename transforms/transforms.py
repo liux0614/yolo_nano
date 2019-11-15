@@ -83,6 +83,8 @@ class PadToSquare(object):
         bboxes = bboxes.pad(padding)
         return image, bboxes
 
+
+
 class ToTensor(object):
     def __init__(self):
         pass
