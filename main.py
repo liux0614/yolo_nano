@@ -43,9 +43,9 @@ if __name__ == "__main__":
     ########################################
     if not opt.no_train:
         train_transforms = get_train_transforms(opt)
-        dataset = get_train_dataset(opt, train_transforms)
-        dataloader = torch.utils.data.DataLoader(
-            dataset,
+        train_dataset = get_train_dataset(opt, train_transforms)
+        train_dataloader = torch.utils.data.DataLoader(
+            train_dataset,
             batch_size=opt.batch_size,
             shuffle=True,
             num_workers=opt.num_threads,
@@ -56,9 +56,9 @@ if __name__ == "__main__":
     
     if not opt.no_val:
         val_transforms = get_val_transforms(opt)
-        dataset = get_val_dataset(opt, val_transforms)
-        dataloader = torch.utils.data.DataLoader(
-            dataset,
+        val_dataset = get_val_dataset(opt, val_transforms)
+        val_dataloader = torch.utils.data.DataLoader(
+            val_dataset,
             batch_size=opt.batch_size,
             shuffle=False,
             num_workers=opt.num_threads,
@@ -69,9 +69,9 @@ if __name__ == "__main__":
 
     if opt.test:
         test_transforms = get_test_transforms(opt)
-        dataset = get_test_dataset(opt, test_transforms)
-        dataloader = torch.utils.data.DataLoader(
-            dataset,
+        test_dataset = get_test_dataset(opt, test_transforms)
+        test_dataloader = torch.utils.data.DataLoader(
+            test_dataset,
             batch_size=opt.batch_size,
             shuffle=False,
             num_workers=opt.num_threads,
@@ -96,12 +96,12 @@ if __name__ == "__main__":
     for epoch in range(opt.begin_epoch, opt.num_epochs + 1):
         if not opt.no_train:
             print("\n---- Training Model ----")
-            train(model, optimizer, dataloader, epoch, opt, train_logger, visualizer)
+            train(model, optimizer, train_dataloader, epoch, opt, train_logger, visualizer)
 
         if not opt.no_val:
             print("\n---- Evaluating Model ----")
-            val(model, dataloader, epoch, opt, val_logger, visualizer)
+            val(model, val_dataloader, epoch, opt, val_logger, visualizer)
 
     
     if opt.test:
-        test(model, dataloader, epoch, opt, val_logger, visualizer)
+        test(model, test_dataloader, epoch, opt, val_logger, visualizer)

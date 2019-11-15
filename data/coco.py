@@ -95,6 +95,7 @@ class COCO(data.Dataset):
     def load_image(self, image_index):
         image_info = self.coco.loadImgs(self.image_ids[image_index])[0]
         image_path = os.path.join(self.root_path, self.subset, image_info['file_name'])
+        print(self.subset)
         image = self.loader(image_path)
         return image
 
