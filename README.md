@@ -24,6 +24,7 @@ root/
         val/
       annotation/
         instances_train2017.json
+        instances_val2017.json
 </pre>
 
 # Installation

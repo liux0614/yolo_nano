@@ -25,12 +25,7 @@ class Visualizer():
         self.plots = {}
 
         self.color_map = plt.get_cmap('tab20b') if color_map is None else color_map
-        self.colors = [self.color_map(i) for i in np.linspace(0, 1, 20)]
-
-        plt.figure()
-
-    def __del():
-        plt.close()
+        self.colors = [self.color_map(i) for i in np.linspace(0, 1, opt.num_classes)]
 
     def plot_metrics(self, metrics, x, env='metrics'):
         for (name, y) in metrics:
@@ -52,6 +47,8 @@ class Visualizer():
         return fig, ax
 
     def plot_ground_truth(self, images, bboxes, env='main'):
+        plt.figure()
+
         image_size = self.opt.image_size
         for i in range(images.size(0)):
             image_i = images[i, ...].transpose(0, 1).transpose(1, 2)
@@ -87,8 +84,12 @@ class Visualizer():
             else:
                 self.viz.matplot(plt, win=self.plots[name], env=env, opts=dict(title=name))
 
+            plt.close()
+
 
     def plot_predictions(self, images, detections, env='main'):
+        plt.figure()
+
         image_size = self.opt.image_size
 
         idx = []
@@ -137,3 +138,5 @@ class Visualizer():
                 self.plots[name] = self.viz.matplot(plt, env=env, opts=dict(title=name))
             else:
                 self.viz.matplot(plt, win=self.plots[name], env=env, opts=dict(title=name))
+
+            plt.close()

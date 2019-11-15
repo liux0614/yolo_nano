@@ -12,7 +12,7 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
     for i, (images, targets) in enumerate(dataloader):
         # targets: [idx, class_id, x, y, h, w] in yolo format
         # idx is used to associate the bounding boxes with its image
-        # skip images without bounding boxes (mainly because coco has unlabelled images) 
+        # skip images without bounding boxes (mainly because coco has unlabelled images)
         if targets.size(0) == 0:
             continue
         

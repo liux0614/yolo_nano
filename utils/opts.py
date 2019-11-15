@@ -12,7 +12,7 @@ class Opt():
         # project root, dataset, checkpoint resume and pretrained model path
         self.parser.add_argument("--project_root", type=str, default=".", help="root directory path of project")
         self.parser.add_argument("--dataset_path", type=str, default="datasets/coco/jpg", help="directory path of dataset")
-        self.parser.add_argument("--annotation_path", type=str, default="datasets/coco/annotation/instances_train2017.json", help="file path of annotations")
+        self.parser.add_argument("--annotation_path", type=str, default="datasets/coco/annotation", help="file path of annotations")
         self.parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="directory path of checkpoints")
         self.parser.add_argument("--resume_path", type=str, default="", help="save data (.pth) of previous training")
         self.parser.add_argument("--pretrain_path", type=str, default="", help="path of pretrain model (.pth)")
