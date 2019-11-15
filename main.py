@@ -49,7 +49,7 @@ if __name__ == "__main__":
             batch_size=opt.batch_size,
             shuffle=True,
             num_workers=opt.num_threads,
-            collate_fn=dataset.collate_fn
+            collate_fn=train_dataset.collate_fn
         )
         train_logger = Logger(os.path.join(opt.checkpoint_path, 'train.log'))
             
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             batch_size=opt.batch_size,
             shuffle=False,
             num_workers=opt.num_threads,
-            collate_fn=dataset.collate_fn
+            collate_fn=val_dataset.collate_fn
         )
         val_logger = Logger(os.path.join(opt.checkpoint_path, 'val.log'))
 
@@ -75,9 +75,9 @@ if __name__ == "__main__":
             batch_size=opt.batch_size,
             shuffle=False,
             num_workers=opt.num_threads,
-            collate_fn=dataset.collate_fn
+            collate_fn=test_dataset.collate_fn
         )
-        val_logger = Logger(os.path.join(opt.checkpoint_path, 'test.log'))
+        test_logger = Logger(os.path.join(opt.checkpoint_path, 'test.log'))
 
     if opt.resume_path:
         print('loading checkpoint {}'.format(opt.resume_path))
@@ -104,4 +104,4 @@ if __name__ == "__main__":
 
     
     if opt.test:
-        test(model, test_dataloader, epoch, opt, val_logger, visualizer)
+        test(model, test_dataloader, epoch, opt, test_logger, visualizer)

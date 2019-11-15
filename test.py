@@ -11,7 +11,7 @@ from utils.stats import (
 
 
 @torch.no_grad()
-def test(model, dataloader, epoch, opt, val_logger, visualizer=None):
+def test(model, dataloader, epoch, opt, test_logger, visualizer=None):
     labels = []
     sample_matrics = []
     for i, (images, targets) in enumerate(dataloader):
@@ -56,6 +56,6 @@ def test(model, dataloader, epoch, opt, val_logger, visualizer=None):
     for i, c in enumerate(ap_class):
         metric_table_data += [['AP-{}'.format(class_names[c]), AP[i]]]
     metric_table.table_data = metric_table_data
-    val_logger.write('{}\n\n\n'.format(metric_table.table))
+    test_logger.write('{}\n\n\n'.format(metric_table.table))
 
     vis.plot_metrics(images, detections)
