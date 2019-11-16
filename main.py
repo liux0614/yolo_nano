@@ -4,6 +4,7 @@ import json
 import torch
 from torch import nn
 from torch import optim
+from adabound import AdaBound
 
 from models.get_model import get_model
 from data.get_dataset import get_train_dataset, get_val_dataset, get_test_dataset
@@ -32,9 +33,14 @@ if __name__ == "__main__":
         visualizer = Visualizer(opt)
     model = get_model(opt)
     if opt.optimizer == 'Adam':
-        optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr)
+        optimizer = torch.optim.Adam(
+            model.parameters(), lr=opt.lr, weight_decay=opt.weight_decay)
+    elif opt.optimizer == 'AdaBound':
+        optimizer = AdaBound(
+            model.parameters(), lr=opt.lr, final_lr=0.1, weight_decay=opt.weight_decay)
     elif opt.optimizer == 'SGD':
-        optimizer = torch.optim.SGD(model.parameters(), lr=opt.lr)
+        optimizer = torch.optim.SGD(
+            model.parameters(), lr=opt.lr, momentum=opt.momentum, weight_decay=opt.weight_decay)
     else:
         NotImplementedError("Only Adam and SGD are supported")
     

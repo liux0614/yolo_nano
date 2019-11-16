@@ -28,14 +28,18 @@ class Opt():
         self.parser.add_argument("--val_interval", type=int, default=5, help="evaluation every 5 epochs")
 
         self.parser.add_argument("--model", type=str, default="yolo_nano", help="choose which model to use")
-        self.parser.add_argument("--optimizer", type=str, default="Adam", help="optimizer (Adam | SGD)")
         self.parser.add_argument("--image_size", type=int, default=416, help="size of image")
         self.parser.add_argument("--num_classes", type=int, default=80, help="# of classes of the dataset")
         self.parser.add_argument('--num_epochs', type=int, default=20, help='# of epochs')
         self.parser.add_argument('--begin_epoch', type=int, default=0, help='# of epochs')
         self.parser.add_argument("--batch_size", type=int, default=8, help="batch size")
-        self.parser.add_argument('--lr', type=float, default=1e-4, help="divided by `lr_patience` while training by lr scheduler")
         self.parser.add_argument('--gradient_accumulations', type=int, default=1, help="number of gradient accums before step")
+
+        self.parser.add_argument("--optimizer", type=str, default="Adam", help="optimizer (Adam | SGD | AdaBound)")
+        self.parser.add_argument('--lr', type=float, default=1e-4, help="learning rate")
+        self.parser.add_argument('--momentum', type=float, default=0.9, help="momentum for optimizer")
+        self.parser.add_argument('--weight_decay', type=float, default=1e-3, help="weight_decay for optimizer")
+        self.parser.add_argument('--final_lr', type=float, default=0.1, help="final learning rate used by AdaBound optimizer")
         
         # object detection options
         self.parser.add_argument("--conf_thres", type=float, default=.8)
