@@ -97,8 +97,7 @@ if __name__ == "__main__":
         if not opt.no_train:
             print("\n---- Training Model ----")
             train(model, optimizer, train_dataloader, epoch, opt, train_logger, visualizer)
-
-        if not opt.no_val:
+        if not opt.no_val and (epoch+1) % opt.val_interval == 0:
             print("\n---- Evaluating Model ----")
             val(model, val_dataloader, epoch, opt, val_logger, visualizer)
 

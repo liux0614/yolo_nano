@@ -25,7 +25,7 @@ class Opt():
         self.parser.add_argument("--num_threads", type=int, default=8, help="# of cpu threads to use for batch generation")
         self.parser.add_argument("--dataset", default="coco", help="specify the type of custom dataset to create")
         self.parser.add_argument("--checkpoint_interval", type=int, default=10, help="interval between saving model weights")
-        self.parser.add_argument("--evaluation_interval", type=int, default=1, help="interval evaluations on validation set")
+        self.parser.add_argument("--val_interval", type=int, default=5, help="evaluation every 5 epochs")
 
         self.parser.add_argument("--model", type=str, default="yolo_nano", help="choose which model to use")
         self.parser.add_argument("--optimizer", type=str, default="Adam", help="optimizer (Adam | SGD)")
@@ -33,7 +33,7 @@ class Opt():
         self.parser.add_argument("--num_classes", type=int, default=80, help="# of classes of the dataset")
         self.parser.add_argument('--num_epochs', type=int, default=20, help='# of epochs')
         self.parser.add_argument('--begin_epoch', type=int, default=0, help='# of epochs')
-        self.parser.add_argument("--batch_size", type=int, default=16, help="batch size")
+        self.parser.add_argument("--batch_size", type=int, default=8, help="batch size")
         self.parser.add_argument('--lr', type=float, default=1e-4, help="divided by `lr_patience` while training by lr scheduler")
         self.parser.add_argument('--gradient_accumulations', type=int, default=1, help="number of gradient accums before step")
         
