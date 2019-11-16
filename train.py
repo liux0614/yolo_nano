@@ -59,7 +59,8 @@ def train(model, optimizer, dataloader, epoch, opt, logger, visualizer=None):
         #         if key != 'grid_size':
         #             metrics_to_vis += [('{}_yolo_layer_{}'.format(key, j), metric)]
         metrics_to_vis += [('total_loss', loss.item())]
-        visualizer.plot_metrics(metrics_to_vis, batches_done, env='loss')
+        if visualizer is not None:
+            visualizer.plot_metrics(metrics_to_vis, batches_done, env='main')
 
     # save checkpoints
     if epoch % opt.checkpoint_interval == 0:

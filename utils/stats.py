@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-
+# from https://github.com/eriklindernoren/PyTorch-YOLOv3/blob/master/utils/utils.py
 def to_cpu(tensor):
     return tensor.detach().cpu()
 
@@ -123,7 +123,6 @@ def compute_ap(recall, precision):
 
 
 def get_batch_statistics(outputs, targets, iou_threshold):
-    #print(outputs[0], targets[0])
     """ Compute true positives, predicted scores and predicted labels per sample """
     batch_metrics = []
     for sample_i in range(len(outputs)):
@@ -132,10 +131,10 @@ def get_batch_statistics(outputs, targets, iou_threshold):
             continue
 
         output = outputs[sample_i]
-        #print(output[0, :4], output[0, 4], output[0, -1])
         pred_boxes = output[:, :4]
         pred_scores = output[:, 4]
         pred_labels = output[:, -1]
+
 
         true_positives = np.zeros(pred_boxes.shape[0])
 
@@ -146,12 +145,12 @@ def get_batch_statistics(outputs, targets, iou_threshold):
             target_boxes = annotations[:, 1:]
 
             for pred_i, (pred_box, pred_label) in enumerate(zip(pred_boxes, pred_labels)):
-
                 # If targets are found break
                 if len(detected_boxes) == len(annotations):
                     break
 
                 # Ignore if label is not one of the target labels
+                
                 if pred_label not in target_labels:
                     continue
 

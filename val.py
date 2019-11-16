@@ -20,7 +20,6 @@ def val(model, dataloader, epoch, opt, val_logger, visualizer=None):
         
         batches_done = len(dataloader) * epoch + i
         if not opt.no_cuda:
-            images_cpu = images.clone()
             model = model.to(opt.device)
             images = Variable(images.to(opt.device))
             if targets is not None:
@@ -31,8 +30,8 @@ def val(model, dataloader, epoch, opt, val_logger, visualizer=None):
         targets[:, 2:] *= opt.image_size
 
         detections = model.forward(images)
-        detections = non_max_suppression(detections.cpu(), opt.conf_thres, opt.nms_thres)
-        sample_matrics += get_batch_statistics(detections, targets, iou_threshold=0.5)
+        detections = non_max_suppression(detections, opt.conf_thres, opt.nms_thres)
+        sample_matrics += get_batch_statistics(detections, targets.cpu(), iou_threshold=0.5)
 
         if visualizer is not None and not opt.no_vis_preds:
             visualizer.plot_predictions(images.cpu(), detections, env='main') # plot prediction
@@ -58,4 +57,5 @@ def val(model, dataloader, epoch, opt, val_logger, visualizer=None):
     metric_table.table_data = metric_table_data
     val_logger.write('{}\n\n\n'.format(metric_table.table))
 
-    vis.plot_metrics(metric_table_data, batches_done, env='loss')
+    if visualizer is not None:
+        vis.plot_metrics(metric_table_data, batches_done, env='main')
