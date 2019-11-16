@@ -6,4 +6,6 @@ def get_model(opt):
     else:
         raise NotImplementedError('the model [%s] is not implemented' % opt.model)
     print("model [%s] was created" % (model.name()))
+
+    
     return model

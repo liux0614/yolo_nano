@@ -15,7 +15,7 @@ class Opt():
         self.parser.add_argument("--annotation_path", type=str, default="datasets/coco/annotation", help="file path of annotations")
         self.parser.add_argument("--checkpoint_path", type=str, default="checkpoints", help="directory path of checkpoints")
         self.parser.add_argument("--resume_path", type=str, default="", help="save data (.pth) of previous training")
-        self.parser.add_argument("--pretrain_path", type=str, default="", help="path of pretrain model (.pth)")
+        # self.parser.add_argument("--pretrain_path", type=str, default="", help="path of pretrain model (.pth)")
 
         # common options that are used in both train and test
         self.parser.add_argument("--manual_seed", type=int, default=42, help="manual_seed of pytorch")
@@ -89,8 +89,8 @@ class Opt():
             self.opt.checkpoint_path = os.path.join(self.opt.project_root, self.opt.checkpoint_path)
             if self.opt.resume_path:
                 self.opt.resume_path = os.path.join(self.opt.project_root, self.opt.resume_path)
-            if self.opt.pretrain_path:
-                self.opt.pretrain_path = os.path.join(self.opt.project_root, self.opt.pretrain_path)
+            # if self.opt.pretrain_path:
+            #     self.opt.pretrain_path = os.path.join(self.opt.project_root, self.opt.pretrain_path)
 
         os.makedirs(self.opt.checkpoint_path, exist_ok=True)
         

@@ -76,6 +76,13 @@ class YOLONano(nn.Module):
         self.conv11 = conv1x1(462, self.yolo_channels, stride=1, bn=False) # output: 13x13x yolo_channels
         self.yolo_layer13 = YOLOLayer(anchors13, num_classes, img_dim=image_size)
 
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                m.weight = nn.init.xavier_normal_(m.weight, gain=0.02)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.normal_(m.weight.data, 1.0, 0.02)
+                m.bias.data.zero_()
+
     def forward(self, x, targets=None):
         loss = 0
         yolo_outputs = []

@@ -9,11 +9,19 @@ YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 - [x] Add COCO dataset support (Code still needs cleaning. I'm working on it.)
 - [x] Add _multi scale_ and _horizontal flip_ transforms
 - [x] Reconstruct the code of visualizer
-- [x] Add val
-- [ ] Add test
+- [x] Add val and test
+- [ ] Add detect
 - [ ] Test accuracy
 
-# Project Structure
+# Installation
+```bash
+git clone https://github.com/liux0614/yolo_nano
+pip3 install -r requirements.txt
+```
+
+# COCO
+
+## Project Structure
 <pre>
 root/
   results/
@@ -27,13 +35,7 @@ root/
         instances_val2017.json
 </pre>
 
-# Installation
-```bash
-git clone https://github.com/liux0614/yolo_nano
-pip3 install -r requirements.txt
-```
-
-# COCO
+## Train
 To use COCO dataset loader, _pycocotools_ should be installed via the following command.
 ```bash 
 pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"
