@@ -85,6 +85,10 @@ class Visualizer():
                 self.viz.matplot(plt, win=self.plots[name], env=env, opts=dict(title=name))
 
             plt.close()
+            # By default, only the first image in a batch is visualized for performance issue
+            # caused by ``visdom.matplot``
+            if not opt.vis_all_images:
+                break
 
 
     def plot_predictions(self, images, detections, env='main'):
@@ -140,3 +144,7 @@ class Visualizer():
                 self.viz.matplot(plt, win=self.plots[name], env=env, opts=dict(title=name))
 
             plt.close()
+            # By default, only the first image in a batch is visualized for performance issue
+            # caused by ``visdom.matplot``
+            if not opt.vis_all_images:
+                break

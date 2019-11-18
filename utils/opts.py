@@ -65,6 +65,8 @@ class Opt():
         self.parser.set_defaults(no_vis_gt=False)
         self.parser.add_argument("--no_vis_preds", action="store_true", help="if true, no visualization for predictions")
         self.parser.set_defaults(no_vis_preds=False)
+        self.parser.add_argument("--vis_all_images", action="store_true", help="if true, visualize all images in a batch")
+        self.parser.set_defaults(vis_all_images=False)
         self.parser.add_argument("--classname_path", type=str, default="datasets/coco.names", help="file path of classnames for visualizer")
         self.parser.add_argument("--print_options", default=True, help="print options or not")
 
