@@ -13,6 +13,7 @@ class Logger(object):
 
     def write(self, message):
         self.log_file.write(message)
+        self.log_file.flush()
 
     def print_and_write(self, message):
         print(message)
