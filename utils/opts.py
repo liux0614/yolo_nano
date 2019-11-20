@@ -42,15 +42,19 @@ class Opt():
         self.parser.add_argument('--final_lr', type=float, default=0.1, help="final learning rate used by AdaBound optimizer")
         
         # object detection options
-        self.parser.add_argument("--conf_thres", type=float, default=.8)
+        self.parser.add_argument("--conf_thres", type=float, default=.5)
         self.parser.add_argument("--nms_thres", type=float, default=.5)
         
         self.parser.add_argument("--no_multi_scale", action="store_true", help="if true, no multi-scale augmentation")
         self.parser.set_defaults(no_multi_scale=False)
-        self.parser.add_argument("--no_hflip", action="store_true", help="if true, no horizontal-flip augmentation")
+        self.parser.add_argument("--no_pad2square", action="store_true", help="if true, no pad to square augmentation")
+        self.parser.set_defaults(no_pad2square=False)
+        # self.parser.add_argument("--no_crop", action="store_true", help="if true, no random crop augmentation")
+        # self.parser.set_defaults(no_crop=False)
+        # self.parser.add_argument('--crop_size', type=int, default=540, help="crop the images to ``crop_size``")
+        self.parser.add_argument("--no_hflip", action="store_true", help="if true, no random horizontal-flip augmentation")
         self.parser.set_defaults(no_hflip=False)
         self.parser.add_argument('--hflip_prob', type=float, default=.5, help="the probability of flipping the image and bboxes horozontally")
-        # self.parser.add_argument("--compute_map", default=False, help="if True computes mAP every 10th batch")
 
         self.parser.add_argument("--no_train", action="store_true", help="training")
         self.parser.set_defaults(no_train=False)

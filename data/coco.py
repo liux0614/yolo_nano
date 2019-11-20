@@ -22,11 +22,6 @@ def resize(image, size, mode='nearest'):
     image = F.interpolate(image.unsqueeze(0), size=size, mode=mode).squeeze(0)
     return image
 
-def hflip(images, targets):
-    images = torch.flip(images, [-1])
-    targets[:, 2] = 1 - targets[:, 2]
-    return images, targets
-
 
 # From https://github.com/yhenon/pytorch-retinanet/blob/master/dataloader.py
 class COCO(data.Dataset):
@@ -35,12 +30,7 @@ class COCO(data.Dataset):
     def __init__(
         self, root_path, annotation_path, subset='train', image_size=416, multi_scale=True,
         transforms=None, get_loader=pil_loader):
-        """
-        Args:
-            root_path (string): COCO directory.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
-        """
+
         self.root_path = root_path
         self.annotation_path = annotation_path
         self.subset = subset
@@ -89,7 +79,6 @@ class COCO(data.Dataset):
 
         targets = torch.zeros((len(bboxes), 6))
         targets[:, 1:] = bboxes
-
         return image, targets
 
     def load_image(self, image_index):
@@ -120,7 +109,7 @@ class COCO(data.Dataset):
             annotations = np.append(annotations, annotation, axis=0)
 
         # [class, x, y, w, h]
-        # [x y] is the coordinate of the upper-left corner of the bbox
+        # [x y] is the coordinate of the lower-left corner of the bbox
         return annotations
 
     def coco_label_to_label(self, coco_label):

@@ -49,15 +49,16 @@ class Visualizer():
     def plot_ground_truth(self, images, bboxes, env='main'):
         plt.figure()
 
-        image_size = self.opt.image_size
         for i in range(images.size(0)):
             image_i = images[i, ...].transpose(0, 1).transpose(1, 2)
+            image_size = image_i.size()[:2]
             bboxes_image_i = bboxes[ bboxes[:, 0] == i ]
             if bboxes_image_i.size(0) == 0:
                 continue
             
             bboxes_image_i = BBox.from_yolo(bboxes_image_i[:, 1:], image_size)
             bboxes_image_i = bboxes_image_i.to_tensor(mode='coco')
+            # print(f"plot: {bboxes_image_i}")
 
             unique_labels = bboxes_image_i[:, 0].unique()
             num_cls_preds = len(unique_labels)
@@ -85,16 +86,14 @@ class Visualizer():
                 self.viz.matplot(plt, win=self.plots[name], env=env, opts=dict(title=name))
 
             plt.close()
-            # By default, only the first image in a batch is visualized for performance issue
-            # caused by ``visdom.matplot``
-            if not opt.vis_all_images:
+            # By default, only the first image in a batch is visualized due to
+            # performance issue caused by ``visdom.matplot``
+            if not self.opt.vis_all_images:
                 break
 
 
     def plot_predictions(self, images, detections, env='main'):
         plt.figure()
-
-        image_size = self.opt.image_size
 
         idx = []
         i = 0
@@ -144,7 +143,7 @@ class Visualizer():
                 self.viz.matplot(plt, win=self.plots[name], env=env, opts=dict(title=name))
 
             plt.close()
-            # By default, only the first image in a batch is visualized for performance issue
-            # caused by ``visdom.matplot``
-            if not opt.vis_all_images:
+            # By default, only the first image in a batch is visualized due to
+            # performance issue caused by ``visdom.matplot``
+            if not self.opt.vis_all_images:
                 break

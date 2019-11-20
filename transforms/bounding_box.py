@@ -118,7 +118,7 @@ class BBox(object):
     def crop(self, box):
         """Crop the bboxes.
         Args:
-            box: 4-tuple
+            box: left, top, left+width, top+height
         """
         w, h = box[2] - box[0], box[3] - box[1]
         classes, xmin, ymin, xmax, ymax = self._split()
@@ -160,16 +160,16 @@ class BBox(object):
         elif isinstance(padding, tuple) and len(padding) == 2:
             left, top, right, bottom = padding[0], padding[1], padding[0], padding[1]
         elif isinstance(padding, tuple) and len(padding) == 4:
-            left, right, top, bottom = padding
+            left, top, right, bottom = padding
         else:
             raise ValueError("Padding must be an int or a 2, or 4 element tuple, not a " +
                              "{} element tuple".format(len(padding)))
         
         classes, xmin, ymin, xmax, ymax = self._split()
-        padded_xmin += left
-        padded_ymin += top
-        padded_xmax += right
-        padded_ymax += bottom
+        padded_xmin = xmin + left
+        padded_ymin = ymin + top
+        padded_xmax = xmax + left
+        padded_ymax = ymax + top
 
         padded_bboxes = torch.cat((classes, padded_xmin, padded_ymin, padded_xmax, padded_ymax), -1)
         w, h = self.size
