@@ -3,6 +3,7 @@
 YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 
 # TODO
+Since I'm too busy at the end of the semester, I will continue working on this project after my exams.
 - [x] Finish a draft version of implementation
 - [x] Add README
 - [x] Add checkpoint support
@@ -10,7 +11,7 @@ YOLO nano is from this [paper](https://arxiv.org/abs/1910.01271).
 - [x] Add _multi scale_ and _horizontal flip_ transforms
 - [x] Reconstruct the code of visualizer
 - [x] Add val and test
-- [ ] Add detect
+- [ ] Add VOC support
 - [ ] Test accuracy
 
 # Installation
