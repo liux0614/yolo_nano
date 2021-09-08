@@ -8,4 +8,4 @@ torchvision==0.2.2.post3
 plotly==4.3.0
 terminaltables==3.1.0
 visdom==0.1.8.8
-Pillow==6.2.1
+Pillow==8.3.2
